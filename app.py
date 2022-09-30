@@ -1,4 +1,3 @@
-from cmath import asin
 import pandas as pd
 import plotly.express as px
 
@@ -44,3 +43,18 @@ mas_vendida = pizzas_aux2.groupby('name', as_index=False).agg({'quantity':'sum'}
 pizzas_aux2['order_price'] = pizzas_aux2['quantity'] * pizzas_aux2['price']
 valor_promedio = pizzas_aux2.groupby('order_id', as_index=False).agg({'order_price':'sum'})
 valor_promedio_pedido = valor_promedio['order_price'].mean()
+
+# print(pizzas_aux2.groupby(['order_id'], as_index=False).agg({'order_price':'sum'}))
+capacidad = pd.merge(df_orders_details, df_orders, left_on='order_id', right_on='order_id', how='left')
+# demo = capacidad.groupby(['hour','order_id','quantity'], as_index=False)
+demo = capacidad.sort_values(['hour','order_id'])
+# demo['aux'] = demo['quantity'] / demo['order_id']
+
+demo2 = (demo[['hour', 'order_id', 'order_details_id']])
+
+demo3 = (demo2.groupby(['hour', 'order_id'], as_index=False).agg({'order_details_id':'count'}))
+
+demo4 = (demo3.groupby(['hour'], as_index=False).agg({'order_id':'count', 'order_details_id':'sum'}))
+demo4['avg'] = demo4['order_id'] / 15
+
+print(demo4)
