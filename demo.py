@@ -62,5 +62,13 @@ peores_pizzas  = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).
 # cual es el valor promedio de un pedido, considerando el order_id
 aux3['total_price'] = aux3['price'] * aux3['quantity']
 valor_promedio = aux3.groupby('order_id', as_index=False).agg({'total_price':'sum'})
-print(round(valor_promedio['total_price'].mean(),2))
+valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 
+# eficacia del uso de las mesas
+# primero armamos una grafica para ver que horas tienen mas ordenes
+ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
+agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
+
+fig3 = px.bar(agrupado_ordenes_hora, y='quantity', x='order_id', orientation='h')
+fig3.show()
+print(agrupado_ordenes_hora)
