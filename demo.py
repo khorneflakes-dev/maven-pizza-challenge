@@ -23,8 +23,9 @@ df_orders['hour'] = pd.to_datetime(df_orders['time']).dt.hour
 aux = pd.merge(df_orders_details, df_orders, on='order_id', how='left')
 aux2 = pd.merge(aux, df_pizzas, on='pizza_id', how='left')
 aux3 = pd.merge(aux2, df_pizzas_types, on='pizza_type_id', how='left')
-# dias de la semana mas ocupados
 
+
+# dias de la semana mas ocupados
 
 # buscar cual es el promedio de pizzas hechas por dia
 agrupado_dias = aux3.groupby(['date', 'day'], as_index=False).agg({'quantity':'sum'})
@@ -32,11 +33,10 @@ dias_mas_ocupados = agrupado_dias.groupby(['day'], as_index=False).agg({'date':'
 dias_mas_ocupados['avg'] = round(dias_mas_ocupados['quantity'] / dias_mas_ocupados['date'],0 )
 
 # grafica
-# fig = px.bar(dias_mas_ocupados.sort_values('avg', ascending=True), x='avg', y='day')
+# fig = px.bar(dias_mas_ocupados.sort_values('avg', ascending=True), y='avg', x='day', orientation='v')
 # fig.show()
 
 
-# buscar cual es el promedio de pizzas hechas por hora
 # hacer 2 graficas, una para las horas totales y otra para horas segun el dia
 
 # grafica 1
@@ -51,13 +51,16 @@ horas_mas_ocupadas['avg'] = round(horas_mas_ocupadas['quantity'] / horas_mas_ocu
 
 # fig2 = px.bar(agrupado_horas.head(10), x='hour', y='quantity')
 # fig2.show()
-
+print(horas_mas_ocupadas)
 
 # cuales fueron nuestras mejores y peores pizzas segun el criterio de cual fue la mas o menos vendida
 # mejores pizzas
 mejores_pizzas = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False).head(5)
+mejores_pizzas.columns = ['Pizza Name', 'Quantity Sold']
 # peores pizzas
 peores_pizzas  = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False).tail(5)
+peores_pizzas.columns = ['Pizza Name', 'Quantity Sold']
+
 
 # cual es el valor promedio de un pedido, considerando el order_id
 aux3['total_price'] = aux3['price'] * aux3['quantity']
@@ -69,6 +72,10 @@ valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
 agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
 
-fig3 = px.bar(agrupado_ordenes_hora, y='quantity', x='order_id', orientation='h')
-fig3.show()
-print(agrupado_ordenes_hora)
+agrupado_ordenes_hora['categorizado'] = agrupado_ordenes_hora['quantity'].apply(lambda x: 'Between 1 and 2' if x < 3 else 'Greater than or equal to 3')
+agrupado_ordenes_hora['porcentaje'] = round(agrupado_ordenes_hora['order_id'] / agrupado_ordenes_hora['order_id'].sum() * 100, 2)
+
+categorizado = (agrupado_ordenes_hora.groupby(['categorizado'])['porcentaje'].sum())
+# nuestro modelo de organizacion de asientos entre las 15 mesas tiene una efectividad de 1/3,
+# ya que 2/3 de las ordenes se componene de 1 a 2 pizzas y solo el restante estarua usando el total de asientos de una mesa
+# grafica de pie
