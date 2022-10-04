@@ -1,6 +1,7 @@
 import pandas as pd
-import plotly.express as px
-
+from dash import dash, dcc, html
+import plotly_express as px
+from dash.dependencies import Input, Output
 # Aquí hay algunas preguntas que nos gustaría poder responder:
 
 # ¿Qué días y horas tendemos a estar más ocupados?
@@ -15,67 +16,214 @@ df_orders_details = pd.read_csv('./pizza_sales/order_details.csv', delimiter=','
 df_pizzas = pd.read_csv('./pizza_sales/pizzas.csv', delimiter=',')
 df_pizzas_types = pd.read_csv('./pizza_sales/pizza_types.csv', delimiter=',', encoding='latin1')
 
-# aniadiendo columnas de dia y hora 
+# aniadiendo columns de dia y hora 
 df_orders['day'] = pd.to_datetime(df_orders['date']).dt.day_name()
 df_orders['hour'] = pd.to_datetime(df_orders['time']).dt.hour
 
-# concatenando los dataframes necesarios
-aux = pd.merge(df_orders_details, df_orders, on='order_id', how='left')
-aux2 = pd.merge(aux, df_pizzas, on='pizza_id', how='left')
-aux3 = pd.merge(aux2, df_pizzas_types, on='pizza_type_id', how='left')
+# agrupando df_orders para mostrar los dias mas ocupados y las horas mas ocupadas
+# monday, tuesday ... 0, 1, ...
+dias_ocupados = df_orders.groupby('day', as_index=False).agg({'order_id':'count'})
+horas_ocupadas = df_orders.groupby('hour', as_index=False).agg({'order_id':'count'})
+
+# estas graficas muestran cuantas pizzas estamos haciendo durante cada uno de las horas
+# fig = px.bar(dias_ocupados, x='day', y='order_id')
+
+# buscamos nuestras mejores y peores pizzas vendidas
+# el criterio usado es que es mejor la mas vendida y peor la menos vendida
+
+pizzas_aux = pd.merge(df_orders_details, df_pizzas, left_on='pizza_id', right_on='pizza_id', how='left')
+pizzas_aux2 = pd.merge(pizzas_aux, df_pizzas_types, left_on='pizza_type_id', right_on='pizza_type_id', how='left')
+mas_vendida = pizzas_aux2.groupby('name', as_index=False).agg({'quantity':'sum'})
+
+# fig3 = px.pie(values=[mas_vendida.max().values[1], mas_vendida.min().values[1]],
+#               names=[mas_vendida.max().values[0], mas_vendida.min().values[0]])
+# fig3.show()
+
+# buscamos cual es el valor promedio de un pedido
+
+pizzas_aux2['order_price'] = pizzas_aux2['quantity'] * pizzas_aux2['price']
+valor_promedio = pizzas_aux2.groupby('order_id', as_index=False).agg({'order_price':'sum'})
+valor_promedio_pedido = valor_promedio['order_price'].mean()
+
+# print(pizzas_aux2.groupby(['order_id'], as_index=False).agg({'order_price':'sum'}))
+capacidad = pd.merge(df_orders_details, df_orders, left_on='order_id', right_on='order_id', how='left')
+# demo = capacidad.groupby(['hour','order_id','quantity'], as_index=False)
+demo = capacidad.sort_values(['hour','order_id'])
+# demo['aux'] = demo['quantity'] / demo['order_id']
+
+demo2 = (demo[['hour', 'order_id', 'order_details_id']])
+
+demo3 = (demo2.groupby(['hour', 'order_id'], as_index=False).agg({'order_details_id':'count'}))
+
+demo4 = (demo3.groupby(['hour'], as_index=False).agg({'order_id':'count', 'order_details_id':'sum'}))
+demo4['avg'] = demo4['order_id'] / 15
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    html.Div([
+        html.Img(src='assets/pizzalogo.png', className='pizza-logo'),
+        html.H1("Plato's Pizza", className='title'),
+        html.Img(src='assets/mavenlogo.png', className='maven-logo')
+    ], className = 'banner'),
+
+    # row 1
+    html.Div([
+
+        html.Div([
+
+            html.Div([
+
+                html.P('Dias mas ocupados', className='title-graph1'),
+
+            ], className='row1-column1-row1'),
+
+            html.Div([
+
+                dcc.Graph(id='dias_graph', figure={}, clickData=None)
+
+            ], className='row1-column1-row2')
+
+        ], className='row1-column1'),
+
+        html.Div([
+            
+            html.P('Pizzas Vendidas', className='pizzas-vendidas-title'),
+
+            html.P(id='pizzas-vendidas', className='pizzas-vendidas-count')
+
+        ], className='row1-column2'),
+
+        html.Div([
+
+            html.P('Horas mas ocupadas', className='title-graph2'),
+
+            html.Div([
+
+                dcc.Graph(id='horas-graph', figure={})
+
+            ], className='horas-graph')
+
+        ], className='row1-column3')
+
+    ], className='row1'),
+
+    html.Div([
+
+        html.Div([
+            html.P('Precio promedio de un pedido', className = 'avg-price-title'),
+            html.P(id='precio-promedio-pedido', className = 'avg-price-value')
+        ], className = 'row2-col1'),
+
+        html.Div([
+            
+        ], className = 'row2-col2'),
+
+        html.Div([
 
 
-# dias de la semana mas ocupados
+        ], className = 'row2-col3')
 
-# buscar cual es el promedio de pizzas hechas por dia
-agrupado_dias = aux3.groupby(['date', 'day'], as_index=False).agg({'quantity':'sum'})
-dias_mas_ocupados = agrupado_dias.groupby(['day'], as_index=False).agg({'date':'count', 'quantity':'sum'})
-dias_mas_ocupados['avg'] = round(dias_mas_ocupados['quantity'] / dias_mas_ocupados['date'],0 )
+    ], className='row2'),
 
-# grafica
-# fig = px.bar(dias_mas_ocupados.sort_values('avg', ascending=True), y='avg', x='day', orientation='v')
-# fig.show()
+    html.Div([
+
+        html.P('explicacion de la distribucion de asientos, el como se hizo',
+            className = 'distribution-explain'),
+
+        html.Div([
+
+            dcc.Graph(id='pie-distribution', figure={})
+        ], className='row3-col2'),
+
+        html.Div([
+
+            html.P('conclusion del por que de la grafica')
+
+        ], className = 'row3-col3')
+
+    ], className='row3'),
+
+    html.Div([
+
+        html.P('About me', className='aboutme'),
+
+        html.Div([
+
+            html.Div([
+
+                html.Img(src='assets/github-logo.png', className='github-logo')
+
+            ], className = 'about-icon-1'),
+            
+            html.Div([
+
+                html.Img(src='assets/linkedin-logo.png', className = 'linkedin-logo')
+
+            ], className = 'about-icon-2')
+
+        ], className='about-icons')
+
+    ])
+
+], className = 'main-container')
 
 
-# hacer 2 graficas, una para las horas totales y otra para horas segun el dia
 
-# grafica 1
-agrupado_horas = aux3.groupby(['date', 'hour'], as_index=False).agg({'quantity':'sum'}).sort_values('quantity', ascending=False)
-horas_mas_ocupadas = agrupado_horas.groupby(['hour'], as_index=False).agg({'date':'count', 'quantity':'sum'})
-horas_mas_ocupadas['avg'] = round(horas_mas_ocupadas['quantity'] / horas_mas_ocupadas['date'],0)
-
-# grafica 2
-# agrupado_horas = aux3[aux3['day']=='Sunday'].groupby(['date', 'hour'], as_index=False).agg({'quantity':'sum'}).sort_values('quantity', ascending=False)
-# horas_mas_ocupadas = agrupado_horas.groupby(['hour'], as_index=False).agg({'date':'count', 'quantity':'sum'})
-# horas_mas_ocupadas['avg'] = round(horas_mas_ocupadas['quantity'] / horas_mas_ocupadas['date'],0)
-
-# fig2 = px.bar(agrupado_horas.head(10), x='hour', y='quantity')
-# fig2.show()
-print(horas_mas_ocupadas)
-
-# cuales fueron nuestras mejores y peores pizzas segun el criterio de cual fue la mas o menos vendida
-# mejores pizzas
-mejores_pizzas = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False).head(5)
-mejores_pizzas.columns = ['Pizza Name', 'Quantity Sold']
-# peores pizzas
-peores_pizzas  = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False).tail(5)
-peores_pizzas.columns = ['Pizza Name', 'Quantity Sold']
+@app.callback(
+    Output()
+)
 
 
-# cual es el valor promedio de un pedido, considerando el order_id
-aux3['total_price'] = aux3['price'] * aux3['quantity']
-valor_promedio = aux3.groupby('order_id', as_index=False).agg({'total_price':'sum'})
-valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 
-# eficacia del uso de las mesas
-# primero armamos una grafica para ver que horas tienen mas ordenes
-ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
-agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
 
-agrupado_ordenes_hora['categorizado'] = agrupado_ordenes_hora['quantity'].apply(lambda x: 'Between 1 and 2' if x < 3 else 'Greater than or equal to 3')
-agrupado_ordenes_hora['porcentaje'] = round(agrupado_ordenes_hora['order_id'] / agrupado_ordenes_hora['order_id'].sum() * 100, 2)
 
-categorizado = (agrupado_ordenes_hora.groupby(['categorizado'])['porcentaje'].sum())
-# nuestro modelo de organizacion de asientos entre las 15 mesas tiene una efectividad de 1/3,
-# ya que 2/3 de las ordenes se componene de 1 a 2 pizzas y solo el restante estarua usando el total de asientos de una mesa
-# grafica de pie
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == ('__main__'):
+    app.run_server(debug=True)
