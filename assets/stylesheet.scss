@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+$color-primario: #16113A;
+$color-secundario: #272953;
+$color-texto: rgb(212, 212, 212);
+$fuente-primaria: 'Lato', sans-serif;
+
+*{
+    margin: 0;
+}
+
+.main-container{
+    display: flex;
+    flex-direction: column;
+    background-color: $color-primario;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+
+    .banner{
+        width: 100%;
+        display: flex;
+    }
+
+    .row1{
+        width: 100%;
+        display: flex;
+        background-color: $color-secundario;
+        border-radius: 1.3vw;
+
+        .row1-column1{
+            display: flex;
+            flex-direction: column;
+            width: 60%;
+
+            .row1-column1-row1{
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        .row1-column2{
+            display: flex;
+            flex-direction: column;
+            width: 10%;
+        }
+
+        .row1-column3{
+            display: flex;
+            flex-direction: column;
+            width: 40%;
+        }
+    }
+
+    .row2{
+        width: 100%;
+        display: flex;
+    }
+
+    .row3{
+        width: 100%;
+        display: flex;
+    }
+}
