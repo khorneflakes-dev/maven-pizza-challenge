@@ -16,6 +16,23 @@
 }
 .main-container .banner {
   display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2vh;
+}
+.main-container .banner .pizza-container {
+  display: flex;
+  align-items: center;
+}
+.main-container .banner .pizza-container .title-container {
+  margin-left: 1vw;
+}
+.main-container .banner .pizza-container .pizza-logo {
+  width: 4vw;
+}
+.main-container .banner .maven-logo {
+  width: 4vw;
 }
 .main-container .row1 {
   display: flex;
@@ -39,7 +56,7 @@
 .main-container .row1 .row1-column1 {
   display: flex;
   flex-direction: column;
-  width: 30vw;
+  width: 25vw;
 }
 .main-container .row1 .row1-column1 .row1-column1-row1 {
   display: flex;

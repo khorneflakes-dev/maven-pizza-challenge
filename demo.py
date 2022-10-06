@@ -66,4 +66,5 @@ agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'
 # demo
 
 demo = aux3.groupby(['month'], as_index=False).agg({'total_price': 'sum'})
-print(demo)
+
+print(dias_mas_ocupados)

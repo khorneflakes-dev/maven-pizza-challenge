@@ -61,9 +61,14 @@ app.title = 'Platos Pizza'
 
 app.layout = html.Div([
     html.Div([
-        html.Img(src='assets/pizzalogo.png', className='pizza-logo'),
-        html.H1("Plato's Pizza Year Performance", className='title'),
-        html.Img(src='assets/mavenlogo.png', className='maven-logo')
+        html.Div([
+            html.Img(src='assets/pizzalogo.png', className='pizza-logo'),
+            html.Div([
+                html.H1("Plato's Pizza", className='title'),
+                html.P('Year Performance - 2015', className='subtitle-banner'),
+            ], className = 'title-container'),
+        ], className='pizza-container'),
+        html.Img(src='assets/mavenlogo.png', className='maven-logo'),
     ], className = 'banner'),
 
     # row 1
@@ -251,17 +256,25 @@ def pizzas_sold(clk_data):
 # primera grafica de los dias con mas ventas
 @app.callback(
     Output('dias_graph', component_property='figure'),
-    [Input('dias-aux', component_property='value')]
+    [Input('dias-aux', component_property='value')],
+    [Input('dias_graph', component_property='clickData')]
 )
 
-def graph_dias(value):
+def graph_dias(value, clk_data):
     dias_mas_ocupados.columns = ['Day','Date','Quantity', 'Average']
+    dias_graph = dias_mas_ocupados.sort_values(['Average'], ascending=False)
+    
+    colors = ['#CFA22E']*7
+    if clk_data != None:
+        clk = clk_data['points'][0]['x']
+        list_dias = dias_graph['Day'].tolist()
+        colors[list_dias.index(clk)] = '#252525'
+    
     data_graph = [go.Bar(
-            x = dias_mas_ocupados['Day'],
-            y = dias_mas_ocupados['Average'],
+            x = dias_graph['Day'],
+            y = dias_graph['Average'],
             orientation='v',
-            marker_color=['#E5C852', '#202020','#E5C852','#E5C852','#E5C852','#E5C852',
-                        '#E5C852','#E5C852','#E5C852','#E5C852','#E5C852','#E5C852',],
+            marker_color=colors,
             
             )]
     layout = go.Layout(
@@ -311,7 +324,7 @@ def graph_horas(clk_data):
                         'x': horas_mas_ocupadas['hour'],
                         'y': horas_mas_ocupadas['avg'],
                         'mode': 'lines',
-                        'line': {'color': '#E5C852'},
+                        'line': {'color': '#CFA22E'},
                         'stackgroup': 'one'
                     }
                 ],
@@ -377,7 +390,7 @@ def graph_horas(clk_data):
                         'x': horas_mas_ocupadas['hour'],
                         'y': horas_mas_ocupadas['avg'],
                         'mode': 'lines',
-                        'line': {'color': '#E5C852'},
+                        'line': {'color': '#CFA22E'},
                         'stackgroup': 'one'
                     }
                 ],
@@ -462,12 +475,12 @@ def best_selling(clk_data):
 
 def revenue_per_month(value, value2):
     data = aux3.groupby(['month'], as_index=False).agg({'total_price': 'sum'})
+    data = data.sort_values(['total_price'], ascending=True)
     data_graph = [go.Bar(
         y = data['month'],
         x = data['total_price'],
         orientation='h',
-        marker_color=['#E5C852', '#202020','#E5C852','#E5C852','#E5C852','#E5C852',
-                      '#E5C852','#E5C852','#E5C852','#E5C852','#E5C852','#E5C852',],
+        marker_color=['#CFA22E']*len(data),
         
         )]
     layout = go.Layout(
