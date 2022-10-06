@@ -1,8 +1,9 @@
 import pandas as pd
-from dash import dash, dcc, html
+from dash import dash, dcc, html, dash_table
 import plotly_express as px
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+
 # Aquí hay algunas preguntas que nos gustaría poder responder:
 
 # ¿Qué días y horas tendemos a estar más ocupados?
@@ -17,53 +18,51 @@ df_orders_details = pd.read_csv('./pizza_sales/order_details.csv', delimiter=','
 df_pizzas = pd.read_csv('./pizza_sales/pizzas.csv', delimiter=',')
 df_pizzas_types = pd.read_csv('./pizza_sales/pizza_types.csv', delimiter=',', encoding='latin1')
 
-# aniadiendo columns de dia y hora 
+# aniadiendo columnas de dia y hora 
+df_orders['month'] = pd.to_datetime(df_orders['date']).dt.month_name()
 df_orders['day'] = pd.to_datetime(df_orders['date']).dt.day_name()
 df_orders['hour'] = pd.to_datetime(df_orders['time']).dt.hour
 
-# agrupando df_orders para mostrar los dias mas ocupados y las horas mas ocupadas
-# monday, tuesday ... 0, 1, ...
-dias_ocupados = df_orders.groupby('day', as_index=False).agg({'order_id':'count'})
-horas_ocupadas = df_orders.groupby('hour', as_index=False).agg({'order_id':'count'})
-# estas graficas muestran cuantas pizzas estamos haciendo durante cada uno de las horas
-# fig = px.bar(dias_ocupados, x='day', y='order_id')
+# concatenando los dataframes necesarios
+aux = pd.merge(df_orders_details, df_orders, on='order_id', how='left')
+aux2 = pd.merge(aux, df_pizzas, on='pizza_id', how='left')
+aux3 = pd.merge(aux2, df_pizzas_types, on='pizza_type_id', how='left')
 
-# buscamos nuestras mejores y peores pizzas vendidas
-# el criterio usado es que es mejor la mas vendida y peor la menos vendida
 
-pizzas_aux = pd.merge(df_orders_details, df_pizzas, left_on='pizza_id', right_on='pizza_id', how='left')
-pizzas_aux2 = pd.merge(pizzas_aux, df_pizzas_types, left_on='pizza_type_id', right_on='pizza_type_id', how='left')
-mas_vendida = pizzas_aux2.groupby('name', as_index=False).agg({'quantity':'sum'})
+# dias de la semana mas ocupados
+# buscar cual es el promedio de pizzas hechas por dia
+agrupado_dias = aux3.groupby(['date', 'day'], as_index=False).agg({'quantity':'sum'})
+dias_mas_ocupados = agrupado_dias.groupby(['day'], as_index=False).agg({'date':'count', 'quantity':'sum'})
+dias_mas_ocupados['avg'] = round(dias_mas_ocupados['quantity'] / dias_mas_ocupados['date'],0 )
 
-# fig3 = px.pie(values=[mas_vendida.max().values[1], mas_vendida.min().values[1]],
-#               names=[mas_vendida.max().values[0], mas_vendida.min().values[0]])
-# fig3.show()
 
-# buscamos cual es el valor promedio de un pedido
+# buscar cual es el promedio de pizzas hechas por hora
+# hacer 2 graficas, una para las horas totales y otra para horas segun el dia
 
-pizzas_aux2['order_price'] = pizzas_aux2['quantity'] * pizzas_aux2['price']
-valor_promedio = pizzas_aux2.groupby('order_id', as_index=False).agg({'order_price':'sum'})
-valor_promedio_pedido = valor_promedio['order_price'].mean()
+# cuales fueron nuestras mejores y peores pizzas segun el criterio de cual fue la mas o menos vendida
+# mejores pizzas
+mejores_pizzas = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False)
+# peores pizzas
+peores_pizzas  = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False).tail(5)
 
-# print(pizzas_aux2.groupby(['order_id'], as_index=False).agg({'order_price':'sum'}))
-capacidad = pd.merge(df_orders_details, df_orders, left_on='order_id', right_on='order_id', how='left')
-# demo = capacidad.groupby(['hour','order_id','quantity'], as_index=False)
-demo = capacidad.sort_values(['hour','order_id'])
-# demo['aux'] = demo['quantity'] / demo['order_id']
+# cual es el valor promedio de un pedido, considerando el order_id
+aux3['total_price'] = aux3['price'] * aux3['quantity']
+valor_promedio = aux3.groupby('order_id', as_index=False).agg({'total_price':'sum'})
+valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 
-demo2 = demo[['hour', 'order_id', 'order_details_id']]
-
-demo3 = demo2.groupby(['hour', 'order_id'], as_index=False).agg({'order_details_id':'count'})
-
-demo4 = demo3.groupby(['hour'], as_index=False).agg({'order_id':'count', 'order_details_id':'sum'})
-demo4['avg'] = demo4['order_id'] / 15
+# eficacia del uso de las mesas
+# primero armamos una grafica para ver que horas tienen mas ordenes
+ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
+agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
 
 app = dash.Dash(__name__)
+
+app.title = 'Platos Pizza'
 
 app.layout = html.Div([
     html.Div([
         html.Img(src='assets/pizzalogo.png', className='pizza-logo'),
-        html.H1("Plato's Pizza", className='title'),
+        html.H1("Plato's Pizza Year Performance", className='title'),
         html.Img(src='assets/mavenlogo.png', className='maven-logo')
     ], className = 'banner'),
 
@@ -71,10 +70,17 @@ app.layout = html.Div([
     html.Div([
 
         html.Div([
+            
+            html.Div([
+            dcc.Graph(id='revenue-per-month', figure={}, clickData=None),
+            ], className='rpm-graph'),
+
+        ], className='row1-column0'),
+
+        html.Div([
 
             html.Div([
                 dcc.RadioItems(id='dias-aux', value='', className='dias-aux'),
-                html.P('Dias mas ocupados', className='title-graph1'),
 
             ], className='row1-column1-row1'),
 
@@ -88,17 +94,24 @@ app.layout = html.Div([
 
         html.Div([
             
-            html.P('Pizzas Vendidas', className='pizzas-vendidas-title'),
+            html.P('Total Pizzas Sold', className='pizzas-vendidas-title'),
 
-            html.P(id='pizzas-vendidas', className='pizzas-vendidas-count')
+            html.P(id='pizzas-dia', className='pizzas-dia'),
+
+            html.P(id='pizzas-vendidas', className='pizzas-vendidas-count'),
+
+            html.P('Orders', className='ordenes-vendidas-title'),
+
+            html.P(id='ordenes-vendidas', className='ordenes-vendidas-value'),
+
+            html.P('Revenue', className='revenue'),
+
+            html.P(id='revenue-value', className='revenue-value'),
+
 
         ], className='row1-column2'),
 
         html.Div([
-
-            html.P('Horas mas ocupadas', className='title-graph2'),
-
-            html.Div(id='horas-ocupadas-dia', className='graph-day'),
 
             html.Div([
 
@@ -113,18 +126,25 @@ app.layout = html.Div([
     html.Div([
 
         html.Div([
-            html.P('Precio promedio de un pedido', className = 'avg-price-title'),
+            html.P('Average Price per Order', className = 'avg-price-title'),
             html.P(id='precio-promedio-pedido', className = 'avg-price-value')
-        ], className = 'row2-col1'),
-
-        html.Div([
-            
-        ], className = 'row2-col2'),
+        ], className = 'row2-column1'),
 
         html.Div([
 
+            html.P('Best Selling Pizzas', className='tabla1-title'),
 
-        ], className = 'row2-col3')
+            html.Div([
+
+                dcc.Graph(id='tabla1', figure={})
+            ])
+
+        ], className = 'row2-column2'),
+
+        html.Div([
+
+
+        ], className = 'row2-column3')
 
     ], className='row2'),
 
@@ -136,13 +156,13 @@ app.layout = html.Div([
         html.Div([
 
             dcc.Graph(id='pie-distribution', figure={})
-        ], className='row3-col2'),
+        ], className='row3-column2'),
 
         html.Div([
 
             html.P('conclusion del por que de la grafica')
 
-        ], className = 'row3-col3')
+        ], className = 'row3-column3')
 
     ], className='row3'),
 
@@ -170,40 +190,106 @@ app.layout = html.Div([
 
 ], className = 'main-container')
 
-
-
+# titulo de semana o dia
 @app.callback(
-    Output('dias_graph', component_property='figure'),
-    [Input('dias-aux', component_property='value')]
-
-)
-
-def graph_dias(value):
-    dias_ocupados.columns = ['Day', 'Pizzas_Sold']
-    fig = px.bar(dias_ocupados, x='Day', y='Pizzas_Sold', template='plotly_dark',
-        color_discrete_sequence=['#E5C852'])
-    
-    fig.update_layout({
-        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
-        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-        'xaxis_title': 'Weekdays',
-        'yaxis_title': 'Pizzas Sold',
-        'font_family': 'Lato',
-        'font_size': 20,
-        })
-    return fig
-
-@app.callback(
-    Output('horas-ocupadas-dia', component_property='children'),
+    Output('pizzas-dia', component_property='children'),
     [Input('dias_graph', component_property='clickData')]
 )
 
-def title_horas(clk_data):
+def pizzas_title(clk_data):
     if clk_data == None:
-        return 'Busiest Hours'
+        return 'During the Week'
     else:
         clk = clk_data['points'][0]['x']
         return clk
+
+# cantidad de ordenes realizadas
+@app.callback(
+    Output('ordenes-vendidas', component_property='children'),
+    [Input('dias_graph', component_property='clickData')]
+)
+
+def orders(clk_data):
+    if clk_data == None:
+        value = aux3['order_id'].count()
+        return f'{value:,.0f}'
+    else:
+        clk = clk_data['points'][0]['x']
+        value = aux3[aux3['day']==clk]['order_id'].count()
+        return f'{value:,.0f}'
+
+# total de ingresos en la semana o el dia 
+@app.callback(
+    Output('revenue-value', component_property='children'),
+    [Input('dias_graph', component_property='clickData')]
+)
+
+def revenue(clk_data):
+    if clk_data == None:
+        rev = aux3['total_price'].sum()
+        return f'$ {rev:,.0f}'
+    else:
+        clk = clk_data['points'][0]['x']
+        rev = aux3[aux3['day']==clk]['total_price'].sum()
+        return f'$ {rev:,.0f}'
+
+# cantidad de pizzas vendidas en la semana o en un dia
+@app.callback(
+    Output('pizzas-vendidas', component_property='children'),
+    [Input('dias_graph', component_property='clickData')]
+)
+
+def pizzas_sold(clk_data):
+    if clk_data == None:
+        cantidad_vendida = aux3['quantity'].sum()
+        return f'{cantidad_vendida:,.0f} Pizzas'
+    else:
+        clk = clk_data['points'][0]['x']
+        cantidad_vendida = aux3[aux3['day']==clk]['quantity'].sum()
+        return f'{cantidad_vendida:,.0f} Pizzas'
+        
+# primera grafica de los dias con mas ventas
+@app.callback(
+    Output('dias_graph', component_property='figure'),
+    [Input('dias-aux', component_property='value')]
+)
+
+def graph_dias(value):
+    dias_mas_ocupados.columns = ['Day','Date','Quantity', 'Average']
+    data_graph = [go.Bar(
+            x = dias_mas_ocupados['Day'],
+            y = dias_mas_ocupados['Average'],
+            orientation='v',
+            marker_color=['#E5C852', '#202020','#E5C852','#E5C852','#E5C852','#E5C852',
+                        '#E5C852','#E5C852','#E5C852','#E5C852','#E5C852','#E5C852',],
+            
+            )]
+    layout = go.Layout(
+    margin=go.layout.Margin(
+        l=0, #left margin
+        r=0, #right margin
+        b=0, #bottom margin
+        t=100, #top margin
+        ))
+    fig = go.Figure(data=data_graph, layout=layout)
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'xaxis_title': '<b>Weekdays</b>',
+        'yaxis_title': 'Average Pizzas Sold',
+        'font_family': 'Lato',
+        'font_color': 'white',
+        'title_text': 'Busiest Days',
+        'title_font_size': 30,
+        'title_xanchor': 'center',
+        'title_yanchor': 'top',
+        'title_x': 0.5,
+        'title_y': 0.9,
+        })
+    fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
+    fig.update_yaxes(tickfont_size=20, title_font={'size': 20})
+
+    return fig
 
 
 @app.callback(
@@ -213,13 +299,17 @@ def title_horas(clk_data):
 
 def graph_horas(clk_data):
     if clk_data == None:
+        # grafica 1
+        agrupado_horas = aux3.groupby(['date', 'hour'], as_index=False).agg({'quantity':'sum'}).sort_values('quantity', ascending=False)
+        horas_mas_ocupadas = agrupado_horas.groupby(['hour'], as_index=False).agg({'date':'count', 'quantity':'sum'})
+        horas_mas_ocupadas['avg'] = round(horas_mas_ocupadas['quantity'] / horas_mas_ocupadas['date'],0)
 
         fig2 = go.Figure(
             {
                 'data': [
                     {
-                        'x': horas_ocupadas['hour'],
-                        'y': horas_ocupadas['order_id'],
+                        'x': horas_mas_ocupadas['hour'],
+                        'y': horas_mas_ocupadas['avg'],
                         'mode': 'lines',
                         'line': {'color': '#E5C852'},
                         'stackgroup': 'one'
@@ -227,11 +317,7 @@ def graph_horas(clk_data):
                 ],
 
                 'layout': {
-                    "paper_bgcolor": "rgba(0,0,0,0)",
-                    "plot_bgcolor": "rgba(0,0,0,0)",
-                    'font_color': "rgb(212, 212, 212)",
-                    'font_family': 'Lato',
-                    'font_size': 20,
+
                     'xaxis': dict(
                             showline=False,
                             showgrid=False,
@@ -245,7 +331,13 @@ def graph_horas(clk_data):
                             showticklabels=True
                     ),
                     'xaxis_title': '<b>Hours</b>',
-                    'yaxis_title': '<b>Pizzas Sold</b>',
+                    'yaxis_title': 'Average  Pizzas  Sold',
+                    'margin': go.layout.Margin(
+                        l=0, #left margin
+                        r=0, #right margin
+                        b=0, #bottom margin
+                        t=100, #top margin
+                        )
                 },
 
                 'traces': {
@@ -253,20 +345,37 @@ def graph_horas(clk_data):
                 }
             }
         )
+        fig2.update_layout({
+            'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+            'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+            'font_family': 'Lato',
+            'font_color': 'white',
+            'title_text': 'Busiest Hours',
+            'title_font_size': 30,
+            'title_xanchor': 'center',
+            'title_yanchor': 'top',
+            'title_x': 0.5,
+            'title_y': 0.9,
+            })
+
+        fig2.update_xaxes(tickfont_size=15, title_font={'size': 20})
+        fig2.update_yaxes(tickfont_size=20, title_font={'size': 20})
 
 
 
         return fig2
     else:
         clk = clk_data['points'][0]['x']
-        horas_ocupadas_por_dia = df_orders[df_orders['day']==clk].groupby('hour', as_index=False).agg({'order_id':'count'})
+        agrupado_horas = aux3[aux3['day']==clk].groupby(['date', 'hour'], as_index=False).agg({'quantity':'sum'}).sort_values('quantity', ascending=False)
+        horas_mas_ocupadas = agrupado_horas.groupby(['hour'], as_index=False).agg({'date':'count', 'quantity':'sum'})
+        horas_mas_ocupadas['avg'] = round(horas_mas_ocupadas['quantity'] / horas_mas_ocupadas['date'],0)
 
-        fig2 = go.Figure(
+    fig2 = go.Figure(
             {
                 'data': [
                     {
-                        'x': horas_ocupadas_por_dia['hour'],
-                        'y': horas_ocupadas_por_dia['order_id'],
+                        'x': horas_mas_ocupadas['hour'],
+                        'y': horas_mas_ocupadas['avg'],
                         'mode': 'lines',
                         'line': {'color': '#E5C852'},
                         'stackgroup': 'one'
@@ -274,11 +383,7 @@ def graph_horas(clk_data):
                 ],
 
                 'layout': {
-                    "paper_bgcolor": "rgba(0,0,0,0)",
-                    "plot_bgcolor": "rgba(0,0,0,0)",
-                    'font_color': "rgb(212, 212, 212)",
-                    'font_family': 'Lato',
-                    'font_size': 15,
+
                     'xaxis': dict(
                             showline=False,
                             showgrid=False,
@@ -292,7 +397,13 @@ def graph_horas(clk_data):
                             showticklabels=True
                     ),
                     'xaxis_title': '<b>Hours</b>',
-                    'yaxis_title': '<b>Pizzas Sold</b>',
+                    'yaxis_title': 'Average  Pizzas  Sold',
+                    'margin': go.layout.Margin(
+                        l=0, #left margin
+                        r=0, #right margin
+                        b=0, #bottom margin
+                        t=100, #top margin
+                        )
                 },
 
                 'traces': {
@@ -300,13 +411,88 @@ def graph_horas(clk_data):
                 }
             }
         )
-        return fig2
+    fig2.update_layout({
+            'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+            'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+            'font_family': 'Lato',
+            'font_color': 'white',
+            'title_text': 'Busiest Hours',
+            'title_font_size': 30,
+            'title_xanchor': 'center',
+            'title_yanchor': 'top',
+            'title_x': 0.5,
+            'title_y': 0.9,
+            })
+    fig2.update_xaxes(tickfont_size=20, title_font={'size': 20})
+    fig2.update_yaxes(tickfont_size=20, title_font={'size': 20})
 
 
 
+    return fig2
 
 
+# tabla de las pizzas mas vendidas por semana y por dia
+@app.callback(
+    Output('tabla1', component_property='figure'),
+    [Input('dias_graph', component_property='clickData')]
+)
 
+def best_selling(clk_data):
+    
+    fig = go.Figure(
+
+        data = [
+            
+            go.Table(
+                
+                header = dict(values=['Name', 'Quantity_Sold']),
+
+                cells = dict(values=[mejores_pizzas['name'], mejores_pizzas['pizza_id']])
+            )
+        ]
+    )
+    return fig
+
+# ingresos por mes
+@app.callback(
+    Output('revenue-per-month', component_property='figure'),
+    [Input('dias-aux', component_property='value')],
+    [Input('dias-aux', component_property='value')]
+)
+
+def revenue_per_month(value, value2):
+    data = aux3.groupby(['month'], as_index=False).agg({'total_price': 'sum'})
+    data_graph = [go.Bar(
+        y = data['month'],
+        x = data['total_price'],
+        orientation='h',
+        marker_color=['#E5C852', '#202020','#E5C852','#E5C852','#E5C852','#E5C852',
+                      '#E5C852','#E5C852','#E5C852','#E5C852','#E5C852','#E5C852',],
+        
+        )]
+    layout = go.Layout(
+        margin=go.layout.Margin(
+            l=0, #left margin
+            r=0, #right margin
+            b=0, #bottom margin
+            t=100, #top margin
+        ))
+    fig = go.Figure(data=data_graph, layout=layout)
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'xaxis_title': '<b>Total Sold</b>',
+        'font_family': 'Lato',
+        'font_color': 'white',
+        'title_text': 'Revenue per Month',
+        'title_font_size': 30,
+        'title_xanchor': 'center',
+        'title_yanchor': 'top',
+        'title_x': 0.5,
+        'title_y': 0.9,
+    })
+    fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
+    return fig
 
 
 
