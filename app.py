@@ -3,6 +3,9 @@ from dash import dash, dcc, html, dash_table
 import plotly_express as px
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+import flask
+
+server = flask.Flask(__name__) # define flask app.server
 
 # Aquí hay algunas preguntas que nos gustaría poder responder:
 
@@ -55,7 +58,7 @@ valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
 agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, server=server)
 
 app.title = 'Platos Pizza'
 
@@ -551,4 +554,4 @@ def revenue_per_month(value, value2):
 
 
 if __name__ == ('__main__'):
-    app.run_server()
+    app.run_server(debug=True)
