@@ -553,5 +553,5 @@ def revenue_per_month(value, value2):
 
 
 
-if __name__ == ('__main__'):
+if __name__ == '__main__':
     app.run_server(debug=True)
