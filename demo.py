@@ -1,3 +1,5 @@
+from cgitb import text
+from cmath import asin
 import pandas as pd
 import plotly.express as px
 
@@ -59,12 +61,18 @@ valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 
 # eficacia del uso de las mesas
 # primero armamos una grafica para ver que horas tienen mas ordenes
-ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
-agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
+ordenes_hora = aux3.groupby(['order_id', 'quantity', 'hour'], as_index=False).agg({'quantity':'sum'})
+agrupado_ordenes_hora = ordenes_hora.groupby(['hour','quantity'],as_index=False).agg({'order_id':'count'})
+# print(agrupado_ordenes_hora)
 
+demo = agrupado_ordenes_hora.groupby(['quantity'], as_index=False).agg({'order_id':'sum'})
 
-# demo
+demo['description'] = demo['quantity'].apply(lambda x: 'between 1 and 2' if x < 3 else 'greater than 3')
+demo['percentage'] = demo['order_id'] / demo['order_id'].sum()
+demo_group = demo.groupby(['description'], as_index=False).agg({'percentage':'sum'})
 
-demo = aux3.groupby(['month'], as_index=False).agg({'total_price': 'sum'})
+fig = px.pie(demo, values='order_id', names='description')
 
-print(dias_mas_ocupados)
+fig.show()
+
+print(demo)
