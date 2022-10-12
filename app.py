@@ -1,11 +1,9 @@
 import pandas as pd
-from dash import dash, dcc, html, dash_table
+from dash import dash, dcc, html
 import plotly_express as px
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
-import flask
 
-server = flask.Flask(__name__) # define flask app.server
 
 # Aquí hay algunas preguntas que nos gustaría poder responder:
 
@@ -58,7 +56,7 @@ valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
 agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
 
-app = dash.Dash(__name__, server=server)
+app = dash.Dash(__name__)
 
 app.title = 'Platos Pizza'
 
@@ -80,14 +78,6 @@ app.layout = html.Div([
         html.Div([
             
             html.Div([
-            dcc.Graph(id='revenue-per-month', figure={}, clickData=None),
-            ], className='rpm-graph'),
-
-        ], className='row1-column0'),
-
-        html.Div([
-
-            html.Div([
                 dcc.RadioItems(id='dias-aux', value='', className='dias-aux'),
 
             ], className='row1-column1-row1'),
@@ -98,26 +88,7 @@ app.layout = html.Div([
 
             ], className='row1-column1-row2')
 
-        ], className='row1-column1'),
-
-        html.Div([
-            
-            html.P('Total Pizzas Sold', className='pizzas-vendidas-title'),
-
-            html.P(id='pizzas-dia', className='pizzas-dia'),
-
-            html.P(id='pizzas-vendidas', className='pizzas-vendidas-count'),
-
-            html.P('Orders', className='ordenes-vendidas-title'),
-
-            html.P(id='ordenes-vendidas', className='ordenes-vendidas-value'),
-
-            html.P('Revenue', className='revenue'),
-
-            html.P(id='revenue-value', className='revenue-value'),
-
-
-        ], className='row1-column2'),
+        ], className='row1-column0'),
 
         html.Div([
 
@@ -127,34 +98,88 @@ app.layout = html.Div([
 
             ], className='horas-graph')
 
+        ], className='row1-column1'),
+
+        html.Div([
+            
+            html.Div([
+            dcc.Graph(id='revenue-per-month', figure={}, clickData=None),
+            ], className='rpm-graph'),
+
         ], className='row1-column3')
 
     ], className='row1'),
+    
+    html.Div([
+        html.Div([
+
+            html.P('2015',id='anio', className='anio')
+
+        ], className = 'row1-1-column1'),
+        
+        html.Div([
+
+            html.P('Revenue', className='revenue-title'),
+
+            html.P(id='revenue-value', className='revenue-value')
+
+        ], className = 'row1-1-column2'),
+        
+        html.Div([
+
+            html.P('# Orders', className='order-title'),
+
+            html.P(id='orders-value', className='orders-value')
+
+        ], className = 'row1-1-column3'),
+        
+        html.Div([
+
+            html.P('Pizzas Sold', className='pizzas-sold-title'),
+
+            html.P(id='pizzas-sold-value', className='pizzas-sold-value')
+
+        ], className = 'row1-1-column4'),
+        
+        html.Div([
+
+            html.P('Average Order Price', className='avg-title'),
+
+            html.P(id='avg-value', className='avg-title')
+        ], className = 'row1-1-column5'),
+        
+
+    ], className='row1-1'),
 
     html.Div([
 
         html.Div([
-            html.P('Average Price per Order', className = 'avg-price-title'),
-            html.P(id='precio-promedio-pedido', className = 'avg-price-value')
-        ], className = 'row2-column1'),
+
+            dcc.Graph(id='best-selling', figure={}),
+
+        ], className='row2-column1'),
 
         html.Div([
 
-            html.P('Best Selling Pizzas', className='tabla1-title'),
+            dcc.Graph(id='size', figure={}),
 
-            html.Div([
-
-                dcc.Graph(id='tabla1', figure={})
-            ])
-
-        ], className = 'row2-column2'),
+        ], className='row2-column2'),
 
         html.Div([
 
+            dcc.Graph(id='type', figure={}),
 
-        ], className = 'row2-column3')
+        ], className='row2-column3'),
+
+        html.Div([
+
+            dcc.Graph(id='worst-selling', figure={}),
+
+        ], className='row2-column4'),
 
     ], className='row2'),
+
+
 
     html.Div([
 
@@ -198,64 +223,70 @@ app.layout = html.Div([
 
 ], className = 'main-container')
 
-# titulo de semana o dia
-@app.callback(
-    Output('pizzas-dia', component_property='children'),
-    [Input('dias_graph', component_property='clickData')]
-)
 
-def pizzas_title(clk_data):
-    if clk_data == None:
-        return 'During the Week'
-    else:
-        clk = clk_data['points'][0]['x']
-        return clk
+# ------
 
-# cantidad de ordenes realizadas
-@app.callback(
-    Output('ordenes-vendidas', component_property='children'),
-    [Input('dias_graph', component_property='clickData')]
-)
+# # titulo de semana o dia
+# @app.callback(
+#     Output('pizzas-dia', component_property='children'),
+#     [Input('dias_graph', component_property='clickData')]
+# )
 
-def orders(clk_data):
-    if clk_data == None:
-        value = aux3['order_id'].count()
-        return f'{value:,.0f}'
-    else:
-        clk = clk_data['points'][0]['x']
-        value = aux3[aux3['day']==clk]['order_id'].count()
-        return f'{value:,.0f}'
+# def pizzas_title(clk_data):
+#     if clk_data == None:
+#         return 'During the Week'
+#     else:
+#         clk = clk_data['points'][0]['x']
+#         return clk
 
-# total de ingresos en la semana o el dia 
-@app.callback(
-    Output('revenue-value', component_property='children'),
-    [Input('dias_graph', component_property='clickData')]
-)
+# # cantidad de ordenes realizadas
+# @app.callback(
+#     Output('ordenes-vendidas', component_property='children'),
+#     [Input('dias_graph', component_property='clickData')]
+# )
 
-def revenue(clk_data):
-    if clk_data == None:
-        rev = aux3['total_price'].sum()
-        return f'$ {rev:,.0f}'
-    else:
-        clk = clk_data['points'][0]['x']
-        rev = aux3[aux3['day']==clk]['total_price'].sum()
-        return f'$ {rev:,.0f}'
+# def orders(clk_data):
+#     if clk_data == None:
+#         value = aux3['order_id'].count()
+#         return f'{value:,.0f}'
+#     else:
+#         clk = clk_data['points'][0]['x']
+#         value = aux3[aux3['day']==clk]['order_id'].count()
+#         return f'{value:,.0f}'
 
-# cantidad de pizzas vendidas en la semana o en un dia
-@app.callback(
-    Output('pizzas-vendidas', component_property='children'),
-    [Input('dias_graph', component_property='clickData')]
-)
+# # total de ingresos en la semana o el dia 
+# @app.callback(
+#     Output('revenue-value', component_property='children'),
+#     [Input('dias_graph', component_property='clickData')]
+# )
 
-def pizzas_sold(clk_data):
-    if clk_data == None:
-        cantidad_vendida = aux3['quantity'].sum()
-        return f'{cantidad_vendida:,.0f} Pizzas'
-    else:
-        clk = clk_data['points'][0]['x']
-        cantidad_vendida = aux3[aux3['day']==clk]['quantity'].sum()
-        return f'{cantidad_vendida:,.0f} Pizzas'
-        
+# def revenue(clk_data):
+#     if clk_data == None:
+#         rev = aux3['total_price'].sum()
+#         return f'$ {rev:,.0f}'
+#     else:
+#         clk = clk_data['points'][0]['x']
+#         rev = aux3[aux3['day']==clk]['total_price'].sum()
+#         return f'$ {rev:,.0f}'
+
+# # cantidad de pizzas vendidas en la semana o en un dia
+# @app.callback(
+#     Output('pizzas-vendidas', component_property='children'),
+#     [Input('dias_graph', component_property='clickData')]
+# )
+
+# def pizzas_sold(clk_data):
+#     if clk_data == None:
+#         cantidad_vendida = aux3['quantity'].sum()
+#         return f'{cantidad_vendida:,.0f} Pizzas'
+#     else:
+#         clk = clk_data['points'][0]['x']
+#         cantidad_vendida = aux3[aux3['day']==clk]['quantity'].sum()
+#         return f'{cantidad_vendida:,.0f} Pizzas'
+
+# -------
+
+
 # primera grafica de los dias con mas ventas
 @app.callback(
     Output('dias_graph', component_property='figure'),
@@ -304,6 +335,7 @@ def graph_dias(value, clk_data):
         })
     fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
     fig.update_yaxes(tickfont_size=20, title_font={'size': 20})
+    fig.update_traces(width=0.5)
 
     return fig
 
@@ -447,28 +479,6 @@ def graph_horas(clk_data):
     return fig2
 
 
-# tabla de las pizzas mas vendidas por semana y por dia
-@app.callback(
-    Output('tabla1', component_property='figure'),
-    [Input('dias_graph', component_property='clickData')]
-)
-
-def best_selling(clk_data):
-    
-    fig = go.Figure(
-
-        data = [
-            
-            go.Table(
-                
-                header = dict(values=['Name', 'Quantity_Sold']),
-
-                cells = dict(values=[mejores_pizzas['name'], mejores_pizzas['pizza_id']])
-            )
-        ]
-    )
-    return fig
-
 # ingresos por mes
 @app.callback(
     Output('revenue-per-month', component_property='figure'),
@@ -508,13 +518,139 @@ def revenue_per_month(value, value2):
         'title_y': 0.9,
     })
     fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
+    fig.update_traces(width=0.4)
     return fig
 
+# mejores pizzas
+@app.callback(
+    Output('best-selling', component_property='figure'),
+    [Input('dias-aux', component_property='value')]
+)
 
+def best_selling(value):
+    mejores_pizzas.columns = ['Name', 'Pizzas Sold']
+    data = mejores_pizzas.sort_values('Pizzas Sold', ascending=True).tail(5)
+    data['Name'] = data['Name']+ '   '
+    data_graph = [go.Bar(
+        y = data['Name'],
+        x = data['Pizzas Sold'],
+        orientation='h',
+        marker_color=['#CFA22E']*len(mejores_pizzas),
+        
+        )]
+    layout = go.Layout(
+        margin=go.layout.Margin(
+            l=0, #left margin
+            r=0, #right margin
+            b=0, #bottom margin
+            t=100, #top margin
+        ))
+    fig = go.Figure(data=data_graph, layout=layout)
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'xaxis_title': '<b>Total Sold</b>',
+        'font_family': 'Lato',
+        'font_color': 'white',
+        'title_text': 'Best Selling Pizzas',
+        'title_font_size': 30,
+        'title_xanchor': 'center',
+        'title_yanchor': 'top',
+        'title_x': 0.5,
+        'title_y': 0.9,
+    })
+    fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
+    fig.update_traces(width=0.3)
+    return fig
 
+# peores pizzas
+@app.callback(
+    Output('worst-selling', component_property='figure'),
+    [Input('dias-aux', component_property='value')]
+)
 
+def worst_selling(value):
+    mejores_pizzas.columns = ['Name', 'Pizzas Sold']
+    data = mejores_pizzas.sort_values('Pizzas Sold', ascending=False).tail(5)
+    data['Name'] = data['Name']+ '   '
+    data_graph = [go.Bar(
+        y = data['Name'],
+        x = data['Pizzas Sold'],
+        orientation='h',
+        marker_color=['#CFA22E']*len(mejores_pizzas),
+        
+        )]
+    layout = go.Layout(
+        margin=go.layout.Margin(
+            l=0, #left margin
+            r=0, #right margin
+            b=0, #bottom margin
+            t=100, #top margin
+        ))
+    fig = go.Figure(data=data_graph, layout=layout)
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'xaxis_title': '<b>Total Sold</b>',
+        'font_family': 'Lato',
+        'font_color': 'white',
+        'title_text': 'Worst Selling Pizzas',
+        'title_font_size': 30,
+        'title_xanchor': 'center',
+        'title_yanchor': 'top',
+        'title_x': 0.5,
+        'title_y': 0.9,
+    })
+    fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
+    fig.update_traces(width=0.3)
+    return fig
 
+# size pizzas 
+@app.callback(
+    Output('size', component_property='figure'),
+    [Input('dias-aux', component_property='value')]
+)
 
+def size_pizzas(value):
+    pizza_size = aux3.groupby(['category'], as_index=False).agg({'quantity':'sum'})
+
+    layout = go.Layout(
+        margin=go.layout.Margin(
+            l=20, #left margin
+            r=20, #right margin
+            b=100, #bottom margin
+            t=100, #top margin
+        ))
+
+    fig = go.Figure(data=go.Scatterpolar(
+        r=pizza_size['quantity'].tolist(),
+        theta=pizza_size['category'].tolist(),
+        fill='toself'
+        ), layout=layout)
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+            visible=True
+            ),
+        ),
+        showlegend=False
+        )
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'xaxis_title': '<b>Total Sold</b>',
+        'font_family': 'Lato',
+        'font_color': 'white',
+        'title_text': 'Category',
+        'title_font_size': 30,
+        'title_xanchor': 'center',
+        'title_yanchor': 'top',
+        'title_x': 0.5,
+        'title_y': 0.9,
+    })
+
+    return fig
 
 
 

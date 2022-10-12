@@ -36,7 +36,7 @@
 }
 .main-container .row1 {
   display: flex;
-  background-color: #2b2b2b;
+  background-color: #373737;
   border-radius: 0.5vw;
   padding-left: 2vw;
   padding-right: 2vw;
@@ -46,7 +46,7 @@
 .main-container .row1 .row1-column0 {
   display: flex;
   flex-direction: column;
-  width: 23vw;
+  width: 33%;
 }
 .main-container .row1 .row1-column0 .rpm-graph {
   display: flex;
@@ -56,7 +56,7 @@
 .main-container .row1 .row1-column1 {
   display: flex;
   flex-direction: column;
-  width: 25vw;
+  width: 33%;
 }
 .main-container .row1 .row1-column1 .row1-column1-row1 {
   display: flex;
@@ -73,60 +73,62 @@
   flex-direction: column;
   width: 100%;
 }
-.main-container .row1 .row1-column2 {
-  display: flex;
-  flex-direction: column;
-  width: 12vw;
-  margin-top: 36px;
-}
-.main-container .row1 .row1-column2 .pizzas-vendidas-title {
-  font-size: 30px;
-}
-.main-container .row1 .row1-column2 .pizzas-dia {
-  font-size: 25px;
-  margin-top: 50px;
-  font-weight: 400;
-}
-.main-container .row1 .row1-column2 .pizzas-vendidas-count,
-.main-container .row1 .row1-column2 .ordenes-vendidas-value,
-.main-container .row1 .row1-column2 .revenue-value {
-  font-size: 23px;
-  padding-left: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-style: italic;
-}
-.main-container .row1 .row1-column2 .ordenes-vendidas-title,
-.main-container .row1 .row1-column2 .revenue {
-  font-size: 25px;
-  font-weight: 400;
-}
 .main-container .row1 .row1-column3 {
   display: flex;
   flex-direction: column;
-  width: 28vw;
+  width: 33%;
+}
+.main-container .row1-1 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3vh;
+  margin-bottom: 3vh;
+  gap: 2vw;
+}
+.main-container .row1-1 .row1-1-column1, .main-container .row1-1 .row1-1-column2, .main-container .row1-1 .row1-1-column3, .main-container .row1-1 .row1-1-column4, .main-container .row1-1 .row1-1-column5 {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5vw;
+  background-color: #373737;
+  color: white;
+  height: 13vh;
+  width: 100%;
+  text-align: center;
+  font-size: 1.4vw;
+  font-weight: 500;
+}
+.main-container .row1-1 .row1-1-column1 .revenue-title, .main-container .row1-1 .row1-1-column1 .order-title, .main-container .row1-1 .row1-1-column1 .pizzas-sold-title, .main-container .row1-1 .row1-1-column1 .avg-title, .main-container .row1-1 .row1-1-column2 .revenue-title, .main-container .row1-1 .row1-1-column2 .order-title, .main-container .row1-1 .row1-1-column2 .pizzas-sold-title, .main-container .row1-1 .row1-1-column2 .avg-title, .main-container .row1-1 .row1-1-column3 .revenue-title, .main-container .row1-1 .row1-1-column3 .order-title, .main-container .row1-1 .row1-1-column3 .pizzas-sold-title, .main-container .row1-1 .row1-1-column3 .avg-title, .main-container .row1-1 .row1-1-column4 .revenue-title, .main-container .row1-1 .row1-1-column4 .order-title, .main-container .row1-1 .row1-1-column4 .pizzas-sold-title, .main-container .row1-1 .row1-1-column4 .avg-title, .main-container .row1-1 .row1-1-column5 .revenue-title, .main-container .row1-1 .row1-1-column5 .order-title, .main-container .row1-1 .row1-1-column5 .pizzas-sold-title, .main-container .row1-1 .row1-1-column5 .avg-title {
+  padding-top: 2vh;
+}
+.main-container .row1-1 .row1-1-column1 {
+  font-family: "Lato", sans-serif;
+  flex-direction: row;
+  font-size: 7vh;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
 }
 .main-container .row2 {
   margin-top: 2vh;
   width: 100%;
   display: flex;
-  background-color: #2b2b2b;
+  background-color: #373737;
   border-radius: 0.5vw;
+  justify-content: space-between;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  padding-bottom: 4vh;
+  gap: 1vw;
 }
-.main-container .row2 .row2-column1 {
+.main-container .row2 .row2-column1, .main-container .row2 .row2-column4 {
   display: flex;
+  width: 30%;
   flex-direction: column;
+}
+.main-container .row2 .row2-column2, .main-container .row2 .row2-column3 {
+  display: flex;
   width: 20%;
-}
-.main-container .row2 .row2-column2 {
-  display: flex;
   flex-direction: column;
-  width: 40%;
-}
-.main-container .row2 .row2-column3 {
-  display: flex;
-  flex-direction: column;
-  width: 40%;
 }
 .main-container .row3 {
   width: 100%;

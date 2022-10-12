@@ -1,7 +1,6 @@
-from cgitb import text
-from cmath import asin
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 # Aquí hay algunas preguntas que nos gustaría poder responder:
 
@@ -63,16 +62,61 @@ valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 # primero armamos una grafica para ver que horas tienen mas ordenes
 ordenes_hora = aux3.groupby(['order_id', 'quantity', 'hour'], as_index=False).agg({'quantity':'sum'})
 agrupado_ordenes_hora = ordenes_hora.groupby(['hour','quantity'],as_index=False).agg({'order_id':'count'})
-# print(agrupado_ordenes_hora)
+agrupado_ordenes_hora['description'] = agrupado_ordenes_hora['quantity'].apply(lambda x: 'between 1 and 2' if x < 3 else 'greater than 3')
 
 demo = agrupado_ordenes_hora.groupby(['quantity'], as_index=False).agg({'order_id':'sum'})
 
 demo['description'] = demo['quantity'].apply(lambda x: 'between 1 and 2' if x < 3 else 'greater than 3')
 demo['percentage'] = demo['order_id'] / demo['order_id'].sum()
 demo_group = demo.groupby(['description'], as_index=False).agg({'percentage':'sum'})
+agrupado_ordenes_hora2 =agrupado_ordenes_hora.groupby(['hour','description'], as_index=False).agg({'order_id':'sum'})
+# fig = px.pie(demo, values='order_id', names='description')
 
-fig = px.pie(demo, values='order_id', names='description')
+# fig.show()
 
+
+# fig2 = px.bar(agrupado_ordenes_hora2.sort_values('description'), x='hour', y='order_id', color='description', barmode='group')
+# fig2.update_traces(width=0.4)
+# fig2.update_layout(
+#     xaxis = dict(
+        
+#         tick0 = 0,
+#         dtick = 1
+#     )
+# )
+# fig2.show()
+
+# df = px.data.tips()
+# # fig = px.histogram(df, x="sex", y="total_bill",
+# #              color='smoker', barmode='group',
+# #              histfunc='avg',
+# #              height=400)
+# # fig.show()
+# print(df)
+# print(agrupado_ordenes_hora.groupby(['hour','description'], as_index=False).agg({'order_id':'sum'}))
+
+pizza_size = aux3.groupby(['category'], as_index=False).agg({'quantity':'sum'})
+print(pizza_size)
+
+# fig = go.Figure(data=go.Scatterpolar(
+#   r=pizza_size['quantity'].tolist(),
+#   theta=pizza_size['size'].tolist(),
+#   fill='toself'
+# ))
+
+# fig.update_layout(
+#   polar=dict(
+#     radialaxis=dict(
+#       visible=True
+#     ),
+#   ),
+#   showlegend=False
+# )
+
+# fig.show()
+
+fig = go.Figure(go.Funnelarea(
+    text = pizza_size['category'].tolist(),
+    values = pizza_size['quantity'].tolist()
+    ))
 fig.show()
-
-print(demo)

@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
 $color-primario: #202020;
-$color-secundario: #2b2b2b;
+$color-secundario: #373737;
 $color-texto: #C2C2C2;
 $fuente-primaria: 'Lato', sans-serif;
 
@@ -58,7 +58,7 @@ $fuente-primaria: 'Lato', sans-serif;
         .row1-column0{
             display: flex;
             flex-direction: column;
-            width: 23vw;
+            width: 33%;
 
             .rpm-graph{
                 display: flex;
@@ -70,7 +70,7 @@ $fuente-primaria: 'Lato', sans-serif;
         .row1-column1{
             display: flex;
             flex-direction: column;
-            width: 25vw;
+            width: 33%;
 
             .row1-column1-row1{
                 display: flex;
@@ -91,46 +91,48 @@ $fuente-primaria: 'Lato', sans-serif;
             }
         }
 
-        .row1-column2{
-            display: flex;
-            flex-direction: column;
-            width: 12vw;
-            margin-top: 36px;
-            
-            .pizzas-vendidas-title{
-                font-size: 30px;
-            }
-
-            .pizzas-dia{
-                font-size: 25px;
-                margin-top: 50px;
-                font-weight: 400
-            }
-
-            .pizzas-vendidas-count,
-            .ordenes-vendidas-value,
-            .revenue-value
-            {
-                font-size: 23px;
-                padding-left: 20px;
-                margin-top: 10px;
-                margin-bottom: 10px;
-                font-style: italic;
-            }
-
-            .ordenes-vendidas-title,
-            .revenue
-            {
-                font-size: 25px;
-                font-weight: 400;
-            }
-        }
-
         .row1-column3{
             display: flex;
             flex-direction: column;
-            width: 28vw;
+            width: 33%;
         }
+    }
+
+
+    .row1-1{
+        display: flex;
+        justify-content: space-between;
+        margin-top: 3vh;
+        margin-bottom: 3vh;
+        gap: 2vw;
+
+        .row1-1-column1, .row1-1-column2, .row1-1-column3, .row1-1-column4, .row1-1-column5{
+            display: flex;
+            flex-direction: column;
+            border-radius: 0.5vw;
+            background-color: $color-secundario;
+            color: white;
+            height: 13vh;
+            width: 100%;
+            text-align: center;
+            font-size: 1.4vw;
+            font-weight: 500;
+
+            .revenue-title, .order-title, .pizzas-sold-title, .avg-title{
+                padding-top: 2vh;
+            }
+            
+        }
+
+        .row1-1-column1{
+            font-family: $fuente-primaria;
+            flex-direction: row;
+            font-size: 7vh;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
     }
 
     .row2{
@@ -139,24 +141,24 @@ $fuente-primaria: 'Lato', sans-serif;
         display: flex;
         background-color: $color-secundario;
         border-radius: 0.5vw;
-
-        .row2-column1{
+        justify-content: space-between;
+        padding-left: 2vw;
+        padding-right: 2vw;
+        padding-bottom: 4vh;
+        gap: 1vw;
+    
+        .row2-column1, .row2-column4{
             display: flex;
+            width: 30%;
             flex-direction: column;
+        }
+
+        .row2-column2, .row2-column3{
+            display: flex;
             width: 20%;
+            flex-direction: column;
         }
 
-        .row2-column2{
-            display: flex;
-            flex-direction: column;
-            width: 40%;
-        }
-
-        .row2-column3{
-            display: flex;
-            flex-direction: column;
-            width: 40%;
-        }
     }
 
     .row3{
