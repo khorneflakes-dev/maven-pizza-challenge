@@ -1,5 +1,5 @@
 import pandas as pd
-from dash import dash, dcc, html
+from dash import dash, dcc, html, ctx
 import plotly_express as px
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
@@ -152,13 +152,6 @@ app.layout = html.Div([
     ], className='row1-1'),
 
     html.Div([
-
-        html.Div([
-
-            dcc.Graph(id='best-selling', figure={}),
-
-        ], className='row2-column1'),
-
         html.Div([
 
             dcc.Graph(id='size', figure={}),
@@ -173,13 +166,17 @@ app.layout = html.Div([
 
         html.Div([
 
+            dcc.Graph(id='best-selling', figure={}),
+
+        ], className='row2-column1'),
+
+        html.Div([
+
             dcc.Graph(id='worst-selling', figure={}),
 
         ], className='row2-column4'),
 
     ], className='row2'),
-
-
 
     html.Div([
 
@@ -336,7 +333,7 @@ def graph_dias(value, clk_data):
     fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
     fig.update_yaxes(tickfont_size=20, title_font={'size': 20})
     fig.update_traces(width=0.5)
-
+    
     return fig
 
 
@@ -358,8 +355,9 @@ def graph_horas(clk_data):
                     {
                         'x': horas_mas_ocupadas['hour'],
                         'y': horas_mas_ocupadas['avg'],
-                        'mode': 'lines',
+                        'mode': 'lines+markers',
                         'line': {'color': '#CFA22E'},
+                        # 'text': horas_mas_ocupadas['hour'],
                         'stackgroup': 'one'
                     }
                 ],
@@ -489,6 +487,7 @@ def graph_horas(clk_data):
 def revenue_per_month(value, value2):
     data = aux3.groupby(['month'], as_index=False).agg({'total_price': 'sum'})
     data = data.sort_values(['total_price'], ascending=True)
+    data['month'] = data['month'] + '   '
     data_graph = [go.Bar(
         y = data['month'],
         x = data['total_price'],
@@ -528,7 +527,11 @@ def revenue_per_month(value, value2):
 )
 
 def best_selling(value):
+    vendidas = aux3.groupby(['name'], as_index=False).agg({'total_price':'sum'}).sort_values('total_price', ascending=False)
+
     mejores_pizzas.columns = ['Name', 'Pizzas Sold']
+
+    # 2 opciones a cambiar cantidad y revenue por pizza
     data = mejores_pizzas.sort_values('Pizzas Sold', ascending=True).tail(5)
     data['Name'] = data['Name']+ '   '
     data_graph = [go.Bar(
@@ -605,14 +608,14 @@ def worst_selling(value):
     fig.update_traces(width=0.3)
     return fig
 
-# size pizzas 
+# category pizzas 
 @app.callback(
     Output('size', component_property='figure'),
     [Input('dias-aux', component_property='value')]
 )
 
 def size_pizzas(value):
-    pizza_size = aux3.groupby(['category'], as_index=False).agg({'quantity':'sum'})
+    pizza_category = aux3.groupby(['category'], as_index=False).agg({'quantity':'sum'})
 
     layout = go.Layout(
         margin=go.layout.Margin(
@@ -622,33 +625,15 @@ def size_pizzas(value):
             t=100, #top margin
         ))
 
-    fig = go.Figure(data=go.Scatterpolar(
-        r=pizza_size['quantity'].tolist(),
-        theta=pizza_size['category'].tolist(),
-        fill='toself'
-        ), layout=layout)
-
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(
-            visible=True
-            ),
-        ),
-        showlegend=False
-        )
+    fig = go.Figure(data=[go.Pie(labels=pizza_category['category'], values=pizza_category['quantity'], hole=.4)],
+                    layout=layout)
     fig.update_layout({
         'plot_bgcolor': 'rgba(1, 1, 1, 0)',
         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-        'xaxis_title': '<b>Total Sold</b>',
         'font_family': 'Lato',
         'font_color': 'white',
-        'title_text': 'Category',
-        'title_font_size': 30,
-        'title_xanchor': 'center',
-        'title_yanchor': 'top',
-        'title_x': 0.5,
-        'title_y': 0.9,
     })
+    fig.update_layout(showlegend=False)
 
     return fig
 

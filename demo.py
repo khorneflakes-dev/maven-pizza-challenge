@@ -95,7 +95,7 @@ agrupado_ordenes_hora2 =agrupado_ordenes_hora.groupby(['hour','description'], as
 # print(df)
 # print(agrupado_ordenes_hora.groupby(['hour','description'], as_index=False).agg({'order_id':'sum'}))
 
-pizza_size = aux3.groupby(['category'], as_index=False).agg({'quantity':'sum'})
+pizza_size = aux3.groupby(['size'], as_index=False).agg({'quantity':'sum'})
 print(pizza_size)
 
 # fig = go.Figure(data=go.Scatterpolar(
@@ -115,8 +115,19 @@ print(pizza_size)
 
 # fig.show()
 
-fig = go.Figure(go.Funnelarea(
-    text = pizza_size['category'].tolist(),
-    values = pizza_size['quantity'].tolist()
-    ))
+
+# pizza_size = pizza_size.sort_values('quantity', ascending=False)
+
+# fig = go.Figure(go.Funnel(
+#     y = pizza_size['size'].tolist(),
+#     x = pizza_size['quantity'].tolist()))
+
+# fig.show()
+
+fig = px.pie(pizza_size, values='quantity', names='size')
+
 fig.show()
+
+# cantidad_vendidas = aux3.groupby(['name'], as_index=False).agg({'total_price':'sum'}).sort_values('total_price', ascending=False)
+
+# print(cantidad_vendidas)
