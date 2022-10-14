@@ -3,6 +3,7 @@ from dash import dash, dcc, html, ctx
 import plotly_express as px
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+import os
 
 
 # Aquí hay algunas preguntas que nos gustaría poder responder:
@@ -59,6 +60,8 @@ agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'
 app = dash.Dash(__name__)
 
 app.title = 'Platos Pizza'
+
+server = app.server
 
 app.layout = html.Div([
     html.Div([
@@ -790,6 +793,30 @@ def size_pizzas(value):
     fig.update_traces(textposition='inside', textinfo='percent+label')
 
     return fig
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
