@@ -1,17 +1,8 @@
-from flask import Flask
 import pandas as pd
-from dash import dash, dcc, html
+from dash import dash, dcc, html, ctx
 import plotly_express as px
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
-
-
-server = Flask(__name__)
-app = dash.Dash(
-    __name__,
-    server=server,
-    url_base_pathname='/'
-)
 
 
 # Aquí hay algunas preguntas que nos gustaría poder responder:
@@ -803,9 +794,13 @@ def size_pizzas(value):
 
 
 
-@server.route("/")
-def my_dash_app():
-    return app.index()
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
-    app.run(debug=True, port=os.getenv("PORT", default=5000))
+    app.run_server(debug=True)
