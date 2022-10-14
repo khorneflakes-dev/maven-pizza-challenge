@@ -68,12 +68,15 @@ demo = agrupado_ordenes_hora.groupby(['quantity'], as_index=False).agg({'order_i
 
 demo['description'] = demo['quantity'].apply(lambda x: 'between 1 and 2' if x < 3 else 'greater than 3')
 demo['percentage'] = demo['order_id'] / demo['order_id'].sum()
+print(demo)
 demo_group = demo.groupby(['description'], as_index=False).agg({'percentage':'sum'})
 agrupado_ordenes_hora2 =agrupado_ordenes_hora.groupby(['hour','description'], as_index=False).agg({'order_id':'sum'})
 fig = px.pie(demo, values='order_id', names='description')
 
 fig.show()
 
+analisis = (aux3.groupby(['order_id'], as_index=False).agg({'quantity':'sum'}))
+print(analisis.groupby(['quantity'], as_index=False).agg({'order_id':'count'}))
 
 # fig2 = px.bar(agrupado_ordenes_hora2.sort_values('description'), x='hour', y='order_id', color='description', barmode='group')
 # fig2.update_traces(width=0.4)

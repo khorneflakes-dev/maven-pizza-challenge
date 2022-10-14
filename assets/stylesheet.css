@@ -159,17 +159,55 @@
   gap: 2vh;
 }
 .main-container .row3 {
-  width: 100%;
   display: flex;
+  background-color: #373737;
+  border-radius: 0.5vw;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  padding-bottom: 4vh;
+  margin-top: 4vh;
+  gap: 3vw;
+  height: 50vh;
+}
+.main-container .row3 .row3-column1 {
+  display: flex;
+  width: 60%;
+}
+.main-container .row3 .row3-column1 .seats-graph {
+  width: 100%;
+}
+.main-container .row3 .row3-column2 {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  font-family: "Lato", sans-serif;
+  font-size: 2.1vh;
+  align-items: center;
+  justify-content: center;
+  text-align: justify;
+  gap: 1vh;
+}
+.main-container .row3 .row3-column2 .title {
+  font-weight: 900;
+  padding-bottom: 2vh;
+}
+.main-container .row3 .row3-column3 {
+  display: flex;
+  width: 20%;
+}
+.main-container .row3 .row3-column3 .pie-seats-graph {
+  width: 100%;
 }
 .main-container .about-me {
   display: flex;
   flex-direction: column;
+  margin-top: 4vh;
 }
 .main-container .about-me .about-me-title {
   font-family: "Lato", sans-serif;
   font-size: 2vh;
   text-align: center;
+  margin-bottom: 2vh;
 }
 .main-container .about-me .about-icons {
   display: flex;
@@ -180,6 +218,6 @@
 .main-container .about-me .about-icons .about-icon-1, .main-container .about-me .about-icons .about-icon-2 {
   width: 3%;
 }
-.main-container .about-me .about-icons .about-icon-1 .github-logo, .main-container .about-me .about-icons .about-icon-1 .linkedin-logo, .main-container .about-me .about-icons .about-icon-2 .github-logo, .main-container .about-me .about-icons .about-icon-2 .linkedin-logo {
+.main-container .about-me .about-icons .about-icon-1 .github-logo img, .main-container .about-me .about-icons .about-icon-1 .linkedin-logo img, .main-container .about-me .about-icons .about-icon-2 .github-logo img, .main-container .about-me .about-icons .about-icon-2 .linkedin-logo img {
   width: 100%;
 }/*# sourceMappingURL=stylesheet.css.map */

@@ -187,18 +187,24 @@ app.layout = html.Div([
 
     html.Div([
 
-        html.P('explicacion de la distribucion de asientos, el como se hizo',
-            className = 'distribution-explain'),
+        html.Div([
+            dcc.Graph(id='seats', figure={}, className='seats-graph')
+        ], className='row3-column1'),
 
         html.Div([
 
-            dcc.Graph(id='pie-distribution', figure={})
-        ], className='row3-column2'),
+            html.P('Seating Capacity Review', className='title'),
+
+            html.P('We have 60 seats and 15 tables, so we have 4 seats per table'),
+
+            html.P('Approximately 70% of the orders are for 1 or 2 pizzas and the remaining 30% are orders for 3, 4 or more pizzas'),
+
+            html.P('In conclusion, we are using the full capacity of a table with only 30% of the orders')
+
+        ], className = 'row3-column2'),
 
         html.Div([
-
-            html.P('conclusion del por que de la grafica')
-
+            dcc.Graph(id='pie-seats', figure={}, className='pie-seats-graph')
         ], className = 'row3-column3')
 
     ], className='row3'),
@@ -211,14 +217,31 @@ app.layout = html.Div([
 
             html.Div([
 
-                html.Img(src='assets/github-logo.png', className='github-logo')
+                html.A(
+                    href="https://github.com/khorneflakes-dev/maven-pizza-challenge",
+                    target="_blank",
+                    children=[
+                        html.Img(
+                            alt="source code",
+                            src="assets/github-logo.png",
+                        )
+                    ], className='github-logo'
+                ),
 
             ], className = 'about-icon-1'),
             
             html.Div([
 
-                html.Img(src='assets/linkedin-logo.png', className = 'linkedin-logo')
-
+                html.A(
+                    href="https://www.linkedin.com/in/khorneflakes/",
+                    target="_blank",
+                    children=[
+                        html.Img(
+                            alt="linkedin",
+                            src="assets/linkedin-logo.png",
+                        )
+                    ], className='linkedin-logo'
+                ),
             ], className = 'about-icon-2')
 
         ], className='about-icons')
@@ -554,6 +577,8 @@ def best_selling(selector):
         mejores_pizzas = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False)
     
     mejores_pizzas.columns = ['Name', 'Pizzas Sold']
+    mejores_pizzas['Name'] = mejores_pizzas['Name'].str.replace(' Pizza', '')
+    mejores_pizzas['Name'] = mejores_pizzas['Name'].str.replace('The ', '')
 
     # 2 opciones a cambiar cantidad y revenue por pizza
     data = mejores_pizzas.sort_values('Pizzas Sold', ascending=True).tail(5)
@@ -607,7 +632,9 @@ def worst_selling(selector):
         mejores_pizzas = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False)
     
     mejores_pizzas.columns = ['Name', 'Pizzas Sold']
-    mejores_pizzas.columns = ['Name', 'Pizzas Sold']
+    mejores_pizzas['Name'] = mejores_pizzas['Name'].str.replace(' Pizza', '')
+    mejores_pizzas['Name'] = mejores_pizzas['Name'].str.replace('The ', '')
+
     data = mejores_pizzas.sort_values('Pizzas Sold', ascending=False).tail(5)
     data['Name'] = data['Name']+ '   '
     data_graph = [go.Bar(
@@ -673,12 +700,97 @@ def size_pizzas(value):
         'font_color': 'white',
     })
     fig.update_layout(showlegend=False)
-    fig.update_layout(annotations=[dict(text='Category<br>Pizza', x=0.5, y=0.5, font_size=30, showarrow=False)])
+    fig.update_layout(annotations=[dict(text='Category<br>Pizza', x=0.5, y=0.5, font_size=20, showarrow=False)])
     fig.update_traces(textposition='inside', textinfo='percent+label')
 
     return fig
 
+# analisis de asientos
+@app.callback(
+    Output('seats', component_property='figure'),
+    [Input('dias-aux', component_property='value')]
+)
 
+def graph_horas(clk_data):
+    analisis = aux3.groupby(['order_id'], as_index=False).agg({'quantity':'sum'})
+    analisis = analisis.groupby(['quantity'], as_index=False).agg({'order_id':'count'})
+    analisis.columns = ['Pizzas per order', 'Orders']
+    analisis['description'] = analisis['Pizzas per order'].apply(lambda x: x if x < 5 else '>4')
+    analisis = analisis.groupby(['description'], as_index=False).agg({'Orders':'sum'})
+    analisis['description'] = analisis['description'].astype('string')
+    analisis['description'] = analisis['description'] + '  '
+    analisis = analisis.sort_values('Orders', ascending=True)
+    data_graph = [go.Bar(
+        y = analisis['description'],
+        x = analisis['Orders'],
+        orientation='h',
+        marker_color=['#CFA22E']*len(mejores_pizzas),
+        text=analisis['Orders'],
+        texttemplate='%{text:,.0f}',
+        textfont_size=50,
+        textfont_color='#202020'        
+        )]
+    layout = go.Layout(
+        margin=go.layout.Margin(
+            l=0, #left margin
+            r=0, #right margin
+            b=0, #bottom margin
+            t=100, #top margin
+        ))
+    fig = go.Figure(data=data_graph, layout=layout)
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'xaxis_title': '<b>Orders with n pizzas</b>',
+        'font_family': 'Lato',
+        'font_color': 'white',
+        'title_text': 'Pizzas per Order',
+        'title_font_size': 30,
+        'title_xanchor': 'center',
+        'title_yanchor': 'top',
+        'title_x': 0.5,
+        'title_y': 0.9,
+    })
+    fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
+    fig.update_yaxes(tickfont_size=20)
+    fig.update_traces(width=0.4)
+    return fig
+
+# grafica mostrando resultados del analisis
+@app.callback(
+    Output('pie-seats', component_property='figure'),
+    [Input('dias-aux', component_property='value')]
+)
+
+def size_pizzas(value):
+    demo = agrupado_ordenes_hora.groupby(['quantity'], as_index=False).agg({'order_id':'sum'})
+
+    demo['description'] = demo['quantity'].apply(lambda x: 'between 1 and 2' if x < 3 else 'greater than 3')
+    demo['percentage'] = demo['order_id'] / demo['order_id'].sum()
+    demo.columns = ['quantity', 'Pizzas', 'Description', 'percentage']
+
+    layout = go.Layout(
+        margin=go.layout.Margin(
+            l=0, #left margin
+            r=0, #right margin
+            b=0, #bottom margin
+            t=50, #top margin
+        ))
+
+    fig = go.Figure(data=[go.Pie(labels=demo['Description'], values=demo['Pizzas'],
+                                hole=.5, scalegroup='one', marker_colors=['#CFA22E','#A98425','#7E631B','#574411',])],
+                    layout=layout)
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'font_family': 'Lato',
+        'font_color': 'white',
+    })
+    fig.update_layout(showlegend=False)
+    fig.update_layout(annotations=[dict(text='Use of seats<br>by Orders', x=0.5, y=0.5, font_size=20, showarrow=False)])
+    fig.update_traces(textposition='inside', textinfo='percent+label')
+
+    return fig
 
 
 
