@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+$color-primario: #202020;
+$color-secundario: #373737;
+$color-texto: #C2C2C2;
+$fuente-primaria: 'Lato', sans-serif;
+
+*{
+    margin: 0;
+}
+
+.main-container{
+    display: flex;
+    flex-direction: column;
+    background-color: $color-primario;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    color: white;
+    font-family: $fuente-primaria;
+
+    .banner{
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2vh;
+
+        .pizza-container{
+            display: flex;
+            align-items: center;
+
+            .title-container{
+                margin-left: 1vw;
+            }
+
+            .pizza-logo{
+                width: 4vw;
+            }
+        }
+
+        .maven-logo{
+            width: 4vw;
+        }
+
+    }
+
+    .row1{
+        display: flex;
+        background-color: $color-secundario;
+        border-radius: 0.5vw;
+        padding-left: 2vw;
+        padding-right: 2vw;
+        padding-bottom: 4vh;
+        gap: 3vw;
+
+        .row1-column0{
+            display: flex;
+            flex-direction: column;
+            width: 33%;
+
+            .rpm-graph{
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+
+        .row1-column1{
+            display: flex;
+            flex-direction: column;
+            width: 33%;
+
+            .row1-column1-row1{
+                display: flex;
+                flex-direction: column;
+
+                .title-graph1{
+                    display: flex;
+                    justify-content: center;
+                    text-align: center;
+                    font-size: 30px;
+                }
+            }
+            
+            .row1-column1-row2{
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+
+        .row1-column3{
+            display: flex;
+            flex-direction: column;
+            width: 33%;
+        }
+    }
+
+
+    .row1-1{
+        display: flex;
+        justify-content: space-between;
+        margin-top: 3vh;
+        margin-bottom: 1vh;
+        gap: 2vw;
+
+        .row1-1-column1, .row1-1-column2, .row1-1-column3, .row1-1-column4, .row1-1-column5{
+            display: flex;
+            flex-direction: column;
+            border-radius: 0.5vw;
+            background-color: $color-secundario;
+            color: white;
+            height: 13vh;
+            width: 100%;
+            text-align: center;
+            font-size: 1.4vw;
+            font-weight: 500;
+            gap: 0.5vh;
+
+            .revenue-title, .order-title, .pizzas-sold-title, .avg-title{
+                padding-top: 2vh;
+            }
+
+            .revenue-value, .orders-value, .pizzas-sold-value, .avg-value{
+                font-size: 4vh;
+                font-weight: 600;
+            }
+            
+        }
+
+        .row1-1-column1{
+            font-family: $fuente-primaria;
+            flex-direction: row;
+            font-size: 6vh;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+    }
+
+    .row2{
+        margin-top: 2vh;
+        display: flex;
+        background-color: $color-secundario;
+        border-radius: 0.5vw;
+        justify-content: space-between;
+        padding-left: 2vw;
+        padding-right: 2vw;
+        padding-bottom: 4vh;
+        gap: 1vw;
+    
+        .row2-column1, .row2-column4{
+            display: flex;
+            flex-direction: column;
+            width: 30%;
+
+            .graph-best-selling{
+                width: 100%;
+            }
+
+            .graph-worst-selling{
+                width: 100%;
+            }
+        }
+
+        .row2-column2{
+            display: flex;
+            flex-direction: column;
+            width: 22%;
+        }
+
+        .row2-column3{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: $fuente-primaria;
+            font-size: 2.2vh;
+            text-align: justify;
+            width: 15%;
+            padding-left: 1.5%;
+            padding-right: 1.5%;
+
+            .radio-items{
+                margin-top: 2vh;
+                display: flex;
+                flex-direction: column;
+                gap: 2vh;
+
+            }
+        }
+
+    }
+
+    .row3{
+        display: flex;
+        background-color: $color-secundario;
+        border-radius: 0.5vw;
+        padding-left: 2vw;
+        padding-right: 2vw;
+        padding-bottom: 4vh;
+        margin-top: 4vh;
+        gap: 3vw;
+        height: 50vh;
+
+        .row3-column1{
+            display: flex;
+            width: 60%;
+
+            .seats-graph{
+                width: 100%;
+            }
+        }
+
+        .row3-column2{
+            display: flex;
+            flex-direction: column;
+            width: 20%;
+            font-family: $fuente-primaria;
+            font-size: 2.1vh;
+            align-items: center;
+            justify-content: center;
+            text-align: justify;
+            gap: 1vh;
+
+            .title{
+                font-weight: 900;
+                padding-bottom: 2vh;
+            }
+        }
+
+        .row3-column3{
+            display: flex;
+            width: 20%;
+
+            .pie-seats-graph{
+                width: 100%;
+            }
+        }
+    }
+
+    .about-me{
+        display: flex;
+        flex-direction: column;
+        margin-top: 4vh;
+
+        .about-me-title{
+            font-family: $fuente-primaria;
+            font-size: 2vh;   
+            text-align: center;
+            margin-bottom: 2vh;
+        }
+
+        .about-icons{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            .about-icon-1, .about-icon-2{
+                width: 3%;
+
+                .github-logo, .linkedin-logo{
+                    img{
+
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}
+
