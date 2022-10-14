@@ -1,7 +1,5 @@
+from dash import Dash, dcc, html, Input, Output
 import pandas as pd
-from dash import dash, dcc, html, ctx
-import plotly_express as px
-from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 import os
 
@@ -57,9 +55,8 @@ valor_promedio_orden = round(valor_promedio['total_price'].mean(),2)
 ordenes_hora = aux3.groupby(['order_id', 'quantity'], as_index=False).agg({'quantity':'sum'})
 agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'order_id':'count'})
 
-app = dash.Dash(__name__)
 
-app.title = 'Platos Pizza'
+app = Dash(__name__)
 
 server = app.server
 
@@ -793,40 +790,6 @@ def size_pizzas(value):
     fig.update_traces(textposition='inside', textinfo='percent+label')
 
     return fig
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
