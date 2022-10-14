@@ -70,9 +70,9 @@ demo['description'] = demo['quantity'].apply(lambda x: 'between 1 and 2' if x < 
 demo['percentage'] = demo['order_id'] / demo['order_id'].sum()
 demo_group = demo.groupby(['description'], as_index=False).agg({'percentage':'sum'})
 agrupado_ordenes_hora2 =agrupado_ordenes_hora.groupby(['hour','description'], as_index=False).agg({'order_id':'sum'})
-# fig = px.pie(demo, values='order_id', names='description')
+fig = px.pie(demo, values='order_id', names='description')
 
-# fig.show()
+fig.show()
 
 
 # fig2 = px.bar(agrupado_ordenes_hora2.sort_values('description'), x='hour', y='order_id', color='description', barmode='group')
@@ -95,8 +95,8 @@ agrupado_ordenes_hora2 =agrupado_ordenes_hora.groupby(['hour','description'], as
 # print(df)
 # print(agrupado_ordenes_hora.groupby(['hour','description'], as_index=False).agg({'order_id':'sum'}))
 
-pizza_size = aux3.groupby(['size'], as_index=False).agg({'quantity':'sum'})
-print(pizza_size)
+# pizza_size = aux3.groupby(['size'], as_index=False).agg({'quantity':'sum'})
+# print(pizza_size)
 
 # fig = go.Figure(data=go.Scatterpolar(
 #   r=pizza_size['quantity'].tolist(),
@@ -124,10 +124,13 @@ print(pizza_size)
 
 # fig.show()
 
-fig = px.pie(pizza_size, values='quantity', names='size')
 
-fig.show()
+# fig = px.pie(pizza_size, values='quantity', names='size')
+
+# fig.show()
 
 # cantidad_vendidas = aux3.groupby(['name'], as_index=False).agg({'total_price':'sum'}).sort_values('total_price', ascending=False)
 
 # print(cantidad_vendidas)
+# analizando los asientos
+

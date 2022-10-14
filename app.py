@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pandas as pd
 from dash import dash, dcc, html, ctx
 import plotly_express as px
@@ -113,7 +114,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
 
-            html.P('2015',id='anio', className='anio')
+            html.P(id='anio', className='anio')
 
         ], className = 'row1-1-column1'),
         
@@ -145,7 +146,7 @@ app.layout = html.Div([
 
             html.P('Average Order Price', className='avg-title'),
 
-            html.P(id='avg-value', className='avg-title')
+            html.P(id='avg-value', className='avg-value')
         ], className = 'row1-1-column5'),
         
 
@@ -160,19 +161,25 @@ app.layout = html.Div([
 
         html.Div([
 
-            dcc.Graph(id='type', figure={}),
+            html.P('Top 5 Best and Worst pizzas sold, these sales can be filtered according to:', className = 'descriptor'),
+            dcc.RadioItems(
+                id='selector',
+                options=[
+                    {'label': 'Revenue', 'value': 'revenue'},
+                    {'label': 'Quantity', 'value': 'quantity'},
+                ], value='revenue', className='radio-items')
 
         ], className='row2-column3'),
 
         html.Div([
 
-            dcc.Graph(id='best-selling', figure={}),
+            dcc.Graph(id='best-selling', figure={}, className='graph-best-selling'),
 
         ], className='row2-column1'),
 
         html.Div([
 
-            dcc.Graph(id='worst-selling', figure={}),
+            dcc.Graph(id='worst-selling', figure={}, className='graph-worst-selling'),
 
         ], className='row2-column4'),
 
@@ -198,7 +205,7 @@ app.layout = html.Div([
 
     html.Div([
 
-        html.P('About me', className='about-me'),
+        html.P('About me', className='about-me-title'),
 
         html.Div([
 
@@ -216,70 +223,86 @@ app.layout = html.Div([
 
         ], className='about-icons')
 
-    ])
+    ], className='about-me')
 
 ], className = 'main-container')
 
 
 # ------
 
-# # titulo de semana o dia
-# @app.callback(
-#     Output('pizzas-dia', component_property='children'),
-#     [Input('dias_graph', component_property='clickData')]
-# )
+# titulo de semana o dia
+@app.callback(
+    Output('anio', component_property='children'),
+    [Input('revenue-per-month', component_property='clickData')]
+)
 
-# def pizzas_title(clk_data):
-#     if clk_data == None:
-#         return 'During the Week'
-#     else:
-#         clk = clk_data['points'][0]['x']
-#         return clk
+def pizzas_title(clk_data):
+    if clk_data == None:
+        return '2015'
+    else:
+        clk = clk_data['points'][0]['label']
+        return clk
 
-# # cantidad de ordenes realizadas
-# @app.callback(
-#     Output('ordenes-vendidas', component_property='children'),
-#     [Input('dias_graph', component_property='clickData')]
-# )
+# cantidad de ordenes realizadas
+@app.callback(
+    Output('orders-value', component_property='children'),
+    [Input('revenue-per-month', component_property='clickData')]
+)
 
-# def orders(clk_data):
-#     if clk_data == None:
-#         value = aux3['order_id'].count()
-#         return f'{value:,.0f}'
-#     else:
-#         clk = clk_data['points'][0]['x']
-#         value = aux3[aux3['day']==clk]['order_id'].count()
-#         return f'{value:,.0f}'
+def orders(clk_data):
+    if clk_data == None:
+        value = aux3['order_id'].count()
+        return f'{value:,.0f}'
+    else:
+        clk = clk_data['points'][0]['label']
+        value = aux3[aux3['month']==clk.strip()]['order_id'].count()
+        return f'{value:,.0f}'
 
-# # total de ingresos en la semana o el dia 
-# @app.callback(
-#     Output('revenue-value', component_property='children'),
-#     [Input('dias_graph', component_property='clickData')]
-# )
+# total de ingresos en la semana o el dia 
+@app.callback(
+    Output('revenue-value', component_property='children'),
+    [Input('revenue-per-month', component_property='clickData')]
+)
 
-# def revenue(clk_data):
-#     if clk_data == None:
-#         rev = aux3['total_price'].sum()
-#         return f'$ {rev:,.0f}'
-#     else:
-#         clk = clk_data['points'][0]['x']
-#         rev = aux3[aux3['day']==clk]['total_price'].sum()
-#         return f'$ {rev:,.0f}'
+def revenue(clk_data):
+    if clk_data == None:
+        rev = aux3['total_price'].sum()
+        return f'$ {rev:,.0f}'
+    else:
+        clk = clk_data['points'][0]['label']
+        rev = aux3[aux3['month']==clk.strip()]['total_price'].sum()
+        return f'$ {rev:,.0f}'
 
-# # cantidad de pizzas vendidas en la semana o en un dia
-# @app.callback(
-#     Output('pizzas-vendidas', component_property='children'),
-#     [Input('dias_graph', component_property='clickData')]
-# )
+# cantidad de pizzas vendidas en la semana o en un dia
+@app.callback(
+    Output('pizzas-sold-value', component_property='children'),
+    [Input('revenue-per-month', component_property='clickData')]
+)
 
-# def pizzas_sold(clk_data):
-#     if clk_data == None:
-#         cantidad_vendida = aux3['quantity'].sum()
-#         return f'{cantidad_vendida:,.0f} Pizzas'
-#     else:
-#         clk = clk_data['points'][0]['x']
-#         cantidad_vendida = aux3[aux3['day']==clk]['quantity'].sum()
-#         return f'{cantidad_vendida:,.0f} Pizzas'
+def pizzas_sold(clk_data):
+    if clk_data == None:
+        cantidad_vendida = aux3['quantity'].sum()
+        return f'{cantidad_vendida:,.0f}'
+    else:
+        clk = clk_data['points'][0]['label']
+        cantidad_vendida = aux3[aux3['month']==clk.strip()]['quantity'].sum()
+        return f'{cantidad_vendida:,.0f}'
+
+# precio promedio de una orden segun el mes
+@app.callback(
+    Output('avg-value', component_property='children'),
+    [Input('revenue-per-month', component_property='clickData')]
+)
+
+def avg_value(clk_data):
+    if clk_data == None:
+        avg_value = aux3['total_price'].sum() / aux3['order_id'].count()
+        return f'$ {avg_value:,.2f}'
+    else:
+        clk = clk_data['points'][0]['label']
+        avg_value = aux3[aux3['month']==clk.strip()]['total_price'].sum() / aux3[aux3['month']==clk.strip()]['order_id'].count()
+        return f'$ {avg_value:,.2f}'
+
 
 # -------
 
@@ -407,8 +430,6 @@ def graph_horas(clk_data):
         fig2.update_xaxes(tickfont_size=15, title_font={'size': 20})
         fig2.update_yaxes(tickfont_size=20, title_font={'size': 20})
 
-
-
         return fig2
     else:
         clk = clk_data['points'][0]['x']
@@ -422,8 +443,9 @@ def graph_horas(clk_data):
                     {
                         'x': horas_mas_ocupadas['hour'],
                         'y': horas_mas_ocupadas['avg'],
-                        'mode': 'lines',
+                        'mode': 'lines+markers',
                         'line': {'color': '#CFA22E'},
+                        # 'text': horas_mas_ocupadas['hour'],
                         'stackgroup': 'one'
                     }
                 ],
@@ -458,21 +480,20 @@ def graph_horas(clk_data):
             }
         )
     fig2.update_layout({
-            'plot_bgcolor': 'rgba(1, 1, 1, 0)',
-            'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-            'font_family': 'Lato',
-            'font_color': 'white',
-            'title_text': 'Busiest Hours',
-            'title_font_size': 30,
-            'title_xanchor': 'center',
-            'title_yanchor': 'top',
-            'title_x': 0.5,
-            'title_y': 0.9,
-            })
-    fig2.update_xaxes(tickfont_size=20, title_font={'size': 20})
+        'plot_bgcolor': 'rgba(1, 1, 1, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'font_family': 'Lato',
+        'font_color': 'white',
+        'title_text': 'Busiest Hours',
+        'title_font_size': 30,
+        'title_xanchor': 'center',
+        'title_yanchor': 'top',
+        'title_x': 0.5,
+        'title_y': 0.9,
+        })
+
+    fig2.update_xaxes(tickfont_size=15, title_font={'size': 20})
     fig2.update_yaxes(tickfont_size=20, title_font={'size': 20})
-
-
 
     return fig2
 
@@ -523,12 +544,15 @@ def revenue_per_month(value, value2):
 # mejores pizzas
 @app.callback(
     Output('best-selling', component_property='figure'),
-    [Input('dias-aux', component_property='value')]
+    [Input('selector', component_property='value')]
 )
 
-def best_selling(value):
-    vendidas = aux3.groupby(['name'], as_index=False).agg({'total_price':'sum'}).sort_values('total_price', ascending=False)
-
+def best_selling(selector):
+    if selector == 'revenue':
+        mejores_pizzas = aux3.groupby('name', as_index=False).agg({'total_price':'sum'}).sort_values('total_price', ascending=False).head(5)
+    elif selector == 'quantity':
+        mejores_pizzas = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False)
+    
     mejores_pizzas.columns = ['Name', 'Pizzas Sold']
 
     # 2 opciones a cambiar cantidad y revenue por pizza
@@ -539,7 +563,10 @@ def best_selling(value):
         x = data['Pizzas Sold'],
         orientation='h',
         marker_color=['#CFA22E']*len(mejores_pizzas),
-        
+        text=data['Pizzas Sold'],
+        texttemplate='%{text:,.0f}',
+        textfont_size=50,
+        textfont_color='#202020'        
         )]
     layout = go.Layout(
         margin=go.layout.Margin(
@@ -563,16 +590,23 @@ def best_selling(value):
         'title_y': 0.9,
     })
     fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
-    fig.update_traces(width=0.3)
+    fig.update_traces(width=0.4)
     return fig
 
 # peores pizzas
 @app.callback(
     Output('worst-selling', component_property='figure'),
-    [Input('dias-aux', component_property='value')]
+    [Input('selector', component_property='value')]
 )
 
-def worst_selling(value):
+def worst_selling(selector):
+
+    if selector == 'revenue':
+        mejores_pizzas = aux3.groupby('name', as_index=False).agg({'total_price':'sum'}).sort_values('total_price', ascending=False).head(5)
+    elif selector == 'quantity':
+        mejores_pizzas = aux3.groupby('name', as_index=False).agg({'pizza_id':'count'}).sort_values('pizza_id', ascending=False)
+    
+    mejores_pizzas.columns = ['Name', 'Pizzas Sold']
     mejores_pizzas.columns = ['Name', 'Pizzas Sold']
     data = mejores_pizzas.sort_values('Pizzas Sold', ascending=False).tail(5)
     data['Name'] = data['Name']+ '   '
@@ -581,7 +615,10 @@ def worst_selling(value):
         x = data['Pizzas Sold'],
         orientation='h',
         marker_color=['#CFA22E']*len(mejores_pizzas),
-        
+        text=data['Pizzas Sold'],
+        texttemplate='%{text:,.0f}',
+        textfont_size=50,
+        textfont_color='#202020'        
         )]
     layout = go.Layout(
         margin=go.layout.Margin(
@@ -605,10 +642,11 @@ def worst_selling(value):
         'title_y': 0.9,
     })
     fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
-    fig.update_traces(width=0.3)
+    fig.update_traces(width=0.4)
     return fig
 
-# category pizzas 
+# category pizzas
+ 
 @app.callback(
     Output('size', component_property='figure'),
     [Input('dias-aux', component_property='value')]
@@ -619,13 +657,14 @@ def size_pizzas(value):
 
     layout = go.Layout(
         margin=go.layout.Margin(
-            l=20, #left margin
-            r=20, #right margin
-            b=100, #bottom margin
-            t=100, #top margin
+            l=0, #left margin
+            r=0, #right margin
+            b=0, #bottom margin
+            t=50, #top margin
         ))
 
-    fig = go.Figure(data=[go.Pie(labels=pizza_category['category'], values=pizza_category['quantity'], hole=.4)],
+    fig = go.Figure(data=[go.Pie(labels=pizza_category['category'], values=pizza_category['quantity'],
+                                hole=.5, scalegroup='one', marker_colors=['#CFA22E','#A98425','#7E631B','#574411',])],
                     layout=layout)
     fig.update_layout({
         'plot_bgcolor': 'rgba(1, 1, 1, 0)',
@@ -634,6 +673,8 @@ def size_pizzas(value):
         'font_color': 'white',
     })
     fig.update_layout(showlegend=False)
+    fig.update_layout(annotations=[dict(text='Category<br>Pizza', x=0.5, y=0.5, font_size=30, showarrow=False)])
+    fig.update_traces(textposition='inside', textinfo='percent+label')
 
     return fig
 

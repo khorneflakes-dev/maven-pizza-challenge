@@ -103,7 +103,7 @@ $fuente-primaria: 'Lato', sans-serif;
         display: flex;
         justify-content: space-between;
         margin-top: 3vh;
-        margin-bottom: 3vh;
+        margin-bottom: 1vh;
         gap: 2vw;
 
         .row1-1-column1, .row1-1-column2, .row1-1-column3, .row1-1-column4, .row1-1-column5{
@@ -117,9 +117,15 @@ $fuente-primaria: 'Lato', sans-serif;
             text-align: center;
             font-size: 1.4vw;
             font-weight: 500;
+            gap: 0.5vh;
 
             .revenue-title, .order-title, .pizzas-sold-title, .avg-title{
                 padding-top: 2vh;
+            }
+
+            .revenue-value, .orders-value, .pizzas-sold-value, .avg-value{
+                font-size: 4vh;
+                font-weight: 600;
             }
             
         }
@@ -127,7 +133,7 @@ $fuente-primaria: 'Lato', sans-serif;
         .row1-1-column1{
             font-family: $fuente-primaria;
             flex-direction: row;
-            font-size: 7vh;
+            font-size: 6vh;
             align-items: center;
             justify-content: center;
             font-weight: 700;
@@ -137,7 +143,6 @@ $fuente-primaria: 'Lato', sans-serif;
 
     .row2{
         margin-top: 2vh;
-        width: 100%;
         display: flex;
         background-color: $color-secundario;
         border-radius: 0.5vw;
@@ -149,14 +154,43 @@ $fuente-primaria: 'Lato', sans-serif;
     
         .row2-column1, .row2-column4{
             display: flex;
-            width: 30%;
             flex-direction: column;
+            width: 30%;
+
+            .graph-best-selling{
+                width: 100%;
+            }
+
+            .graph-worst-selling{
+                width: 100%;
+            }
         }
 
-        .row2-column2, .row2-column3{
+        .row2-column2{
             display: flex;
-            width: 20%;
             flex-direction: column;
+            width: 22%;
+        }
+
+        .row2-column3{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: $fuente-primaria;
+            font-size: 2.2vh;
+            text-align: justify;
+            width: 15%;
+            padding-left: 1.5%;
+            padding-right: 1.5%;
+
+            .radio-items{
+                margin-top: 2vh;
+                display: flex;
+                flex-direction: column;
+                gap: 2vh;
+
+            }
         }
 
     }
@@ -165,4 +199,92 @@ $fuente-primaria: 'Lato', sans-serif;
         width: 100%;
         display: flex;
     }
+
+    .about-me{
+        display: flex;
+        flex-direction: column;
+
+        .about-me-title{
+            font-family: $fuente-primaria;
+            font-size: 2vh;   
+            text-align: center;
+        }
+
+        .about-icons{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            .about-icon-1, .about-icon-2{
+                width: 3%;
+
+                .github-logo, .linkedin-logo{
+                    width: 100%;
+                }
+            }
+        }
+    }
 }
+
+
+// .radio-items{
+//     display: flex;
+//     flex-direction: column;
+
+//     input[type="radio"] {
+//         display: none;
+//         &:not(:disabled) ~ label {
+//           cursor: pointer;
+//         }
+//         &:disabled ~ label {
+//           color: hsla(150, 5%, 75%, 1);
+//           border-color: hsla(150, 5%, 75%, 1);
+//           box-shadow: none;
+//           cursor: not-allowed;
+//         }
+//     }
+//     label {
+//         height: 100%;
+//         display: block;
+//         background: rgb(44, 44, 44);
+//         border: 2px solid $color-secundario;
+//         border-radius: 20px;
+//         padding: 1rem;
+//         margin-bottom: 1rem;
+//         //margin: 1rem;
+//         text-align: center;
+//         box-shadow: 0px 3px 10px -2px hsla(150, 5%, 65%, 0.5);
+//         position: relative;
+//     }
+//     input[type="radio"]:checked + label {
+//     background: hsla(150, 75%, 50%, 1);
+//     color: hsla(215, 0%, 100%, 1);
+//     box-shadow: 0px 0px 20px hsla(150, 100%, 50%, 0.75);
+//     &::after {
+//         color: hsla(215, 5%, 25%, 1);
+//         font-family: FontAwesome;
+//         border: 2px solid hsla(150, 75%, 45%, 1);
+//         content: "\f00c";
+//         font-size: 24px;
+//         position: absolute;
+//         top: -25px;
+//         left: 50%;
+//         transform: translateX(-50%);
+//         height: 50px;
+//         width: 50px;
+//         line-height: 50px;
+//         text-align: center;
+//         border-radius: 50%;
+//         background: white;
+//         box-shadow: 0px 2px 5px -2px hsla(0, 0%, 0%, 0.25);
+//     }
+//     }
+//     input[type="radio"]#control_05:checked + label {
+//         background: red;
+//         border-color: red;
+//       }
+//       p {
+//         font-weight: 900;
+//       }
+// }

@@ -82,7 +82,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 3vh;
-  margin-bottom: 3vh;
+  margin-bottom: 1vh;
   gap: 2vw;
 }
 .main-container .row1-1 .row1-1-column1, .main-container .row1-1 .row1-1-column2, .main-container .row1-1 .row1-1-column3, .main-container .row1-1 .row1-1-column4, .main-container .row1-1 .row1-1-column5 {
@@ -96,21 +96,25 @@
   text-align: center;
   font-size: 1.4vw;
   font-weight: 500;
+  gap: 0.5vh;
 }
 .main-container .row1-1 .row1-1-column1 .revenue-title, .main-container .row1-1 .row1-1-column1 .order-title, .main-container .row1-1 .row1-1-column1 .pizzas-sold-title, .main-container .row1-1 .row1-1-column1 .avg-title, .main-container .row1-1 .row1-1-column2 .revenue-title, .main-container .row1-1 .row1-1-column2 .order-title, .main-container .row1-1 .row1-1-column2 .pizzas-sold-title, .main-container .row1-1 .row1-1-column2 .avg-title, .main-container .row1-1 .row1-1-column3 .revenue-title, .main-container .row1-1 .row1-1-column3 .order-title, .main-container .row1-1 .row1-1-column3 .pizzas-sold-title, .main-container .row1-1 .row1-1-column3 .avg-title, .main-container .row1-1 .row1-1-column4 .revenue-title, .main-container .row1-1 .row1-1-column4 .order-title, .main-container .row1-1 .row1-1-column4 .pizzas-sold-title, .main-container .row1-1 .row1-1-column4 .avg-title, .main-container .row1-1 .row1-1-column5 .revenue-title, .main-container .row1-1 .row1-1-column5 .order-title, .main-container .row1-1 .row1-1-column5 .pizzas-sold-title, .main-container .row1-1 .row1-1-column5 .avg-title {
   padding-top: 2vh;
 }
+.main-container .row1-1 .row1-1-column1 .revenue-value, .main-container .row1-1 .row1-1-column1 .orders-value, .main-container .row1-1 .row1-1-column1 .pizzas-sold-value, .main-container .row1-1 .row1-1-column1 .avg-value, .main-container .row1-1 .row1-1-column2 .revenue-value, .main-container .row1-1 .row1-1-column2 .orders-value, .main-container .row1-1 .row1-1-column2 .pizzas-sold-value, .main-container .row1-1 .row1-1-column2 .avg-value, .main-container .row1-1 .row1-1-column3 .revenue-value, .main-container .row1-1 .row1-1-column3 .orders-value, .main-container .row1-1 .row1-1-column3 .pizzas-sold-value, .main-container .row1-1 .row1-1-column3 .avg-value, .main-container .row1-1 .row1-1-column4 .revenue-value, .main-container .row1-1 .row1-1-column4 .orders-value, .main-container .row1-1 .row1-1-column4 .pizzas-sold-value, .main-container .row1-1 .row1-1-column4 .avg-value, .main-container .row1-1 .row1-1-column5 .revenue-value, .main-container .row1-1 .row1-1-column5 .orders-value, .main-container .row1-1 .row1-1-column5 .pizzas-sold-value, .main-container .row1-1 .row1-1-column5 .avg-value {
+  font-size: 4vh;
+  font-weight: 600;
+}
 .main-container .row1-1 .row1-1-column1 {
   font-family: "Lato", sans-serif;
   flex-direction: row;
-  font-size: 7vh;
+  font-size: 6vh;
   align-items: center;
   justify-content: center;
   font-weight: 700;
 }
 .main-container .row2 {
   margin-top: 2vh;
-  width: 100%;
   display: flex;
   background-color: #373737;
   border-radius: 0.5vw;
@@ -122,15 +126,60 @@
 }
 .main-container .row2 .row2-column1, .main-container .row2 .row2-column4 {
   display: flex;
+  flex-direction: column;
   width: 30%;
-  flex-direction: column;
 }
-.main-container .row2 .row2-column2, .main-container .row2 .row2-column3 {
+.main-container .row2 .row2-column1 .graph-best-selling, .main-container .row2 .row2-column4 .graph-best-selling {
+  width: 100%;
+}
+.main-container .row2 .row2-column1 .graph-worst-selling, .main-container .row2 .row2-column4 .graph-worst-selling {
+  width: 100%;
+}
+.main-container .row2 .row2-column2 {
   display: flex;
-  width: 20%;
   flex-direction: column;
+  width: 22%;
+}
+.main-container .row2 .row2-column3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: "Lato", sans-serif;
+  font-size: 2.2vh;
+  text-align: justify;
+  width: 15%;
+  padding-left: 1.5%;
+  padding-right: 1.5%;
+}
+.main-container .row2 .row2-column3 .radio-items {
+  margin-top: 2vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
 }
 .main-container .row3 {
   width: 100%;
   display: flex;
+}
+.main-container .about-me {
+  display: flex;
+  flex-direction: column;
+}
+.main-container .about-me .about-me-title {
+  font-family: "Lato", sans-serif;
+  font-size: 2vh;
+  text-align: center;
+}
+.main-container .about-me .about-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.main-container .about-me .about-icons .about-icon-1, .main-container .about-me .about-icons .about-icon-2 {
+  width: 3%;
+}
+.main-container .about-me .about-icons .about-icon-1 .github-logo, .main-container .about-me .about-icons .about-icon-1 .linkedin-logo, .main-container .about-me .about-icons .about-icon-2 .github-logo, .main-container .about-me .about-icons .about-icon-2 .linkedin-logo {
+  width: 100%;
 }/*# sourceMappingURL=stylesheet.css.map */
