@@ -58,6 +58,7 @@ agrupado_ordenes_hora = ordenes_hora.groupby(['quantity'],as_index=False).agg({'
 
 app = Dash(__name__)
 
+app.title = 'Platos Pizza'
 server = app.server
 
 app.layout = html.Div([
@@ -164,8 +165,8 @@ app.layout = html.Div([
             dcc.RadioItems(
                 id='selector',
                 options=[
-                    {'label': 'Revenue', 'value': 'revenue'},
-                    {'label': 'Quantity', 'value': 'quantity'},
+                    {'label': html.Div(['Revenue'], className='option'), 'value': 'revenue'},
+                    {'label': html.Div(['Quantity'], className='option'), 'value': 'quantity'},
                 ], value='revenue', className='radio-items')
 
         ], className='row2-column3'),
@@ -403,7 +404,7 @@ def graph_horas(clk_data):
                         'mode': 'lines+markers',
                         'line': {'color': '#CFA22E'},
                         # 'text': horas_mas_ocupadas['hour'],
-                        'stackgroup': 'one'
+                        'stackgroup': 'one',
                     }
                 ],
 
@@ -447,6 +448,7 @@ def graph_horas(clk_data):
             'title_yanchor': 'top',
             'title_x': 0.5,
             'title_y': 0.9,
+            
             })
 
         fig2.update_xaxes(tickfont_size=15, title_font={'size': 20})
@@ -536,6 +538,12 @@ def revenue_per_month(value, value2):
         x = data['total_price'],
         orientation='h',
         marker_color=['#CFA22E']*len(data),
+        text=data['total_price'],
+        texttemplate='%{text:,.0f}',
+        textfont_size=60,
+        textfont_color='#202020',
+        hoverinfo='none', 
+        
         
         )]
     layout = go.Layout(
@@ -560,7 +568,7 @@ def revenue_per_month(value, value2):
         'title_y': 0.9,
     })
     fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
-    fig.update_traces(width=0.4)
+    fig.update_traces(width=0.7)
     return fig
 
 # mejores pizzas
@@ -590,7 +598,8 @@ def best_selling(selector):
         text=data['Pizzas Sold'],
         texttemplate='%{text:,.0f}',
         textfont_size=50,
-        textfont_color='#202020'        
+        textfont_color='#202020',
+        hoverinfo='none', 
         )]
     layout = go.Layout(
         margin=go.layout.Margin(
@@ -644,7 +653,8 @@ def worst_selling(selector):
         text=data['Pizzas Sold'],
         texttemplate='%{text:,.0f}',
         textfont_size=50,
-        textfont_color='#202020'        
+        textfont_color='#202020',
+        hoverinfo='none',
         )]
     layout = go.Layout(
         margin=go.layout.Margin(
@@ -752,7 +762,7 @@ def graph_horas(clk_data):
     })
     fig.update_xaxes(tickfont_size=20, title_font={'size': 20})
     fig.update_yaxes(tickfont_size=20)
-    fig.update_traces(width=0.4)
+    fig.update_traces(width=0.4, hoverinfo='none',)
     return fig
 
 # grafica mostrando resultados del analisis
@@ -790,7 +800,6 @@ def size_pizzas(value):
     fig.update_traces(textposition='inside', textinfo='percent+label')
 
     return fig
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)

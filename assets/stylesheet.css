@@ -156,7 +156,34 @@
   margin-top: 2vh;
   display: flex;
   flex-direction: column;
-  gap: 2vh;
+  gap: 0.3vh;
+}
+.main-container .row2 .row2-column3 .radio-items .option {
+  border: solid 3px;
+  border-radius: 0.6vw;
+  background-color: #A98425;
+  border-color: #352A0A;
+  height: 5vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 7vw;
+  color: #352A0A;
+  font-weight: 500;
+}
+.main-container .row2 .row2-column3 .radio-items .option {
+  margin-left: -0.7vw;
+}
+.main-container .row2 .row2-column3 .radio-items input {
+  display: none;
+}
+.main-container .row2 .row2-column3 .radio-items input:checked + .option {
+  font-weight: 900;
+}
+.main-container .row2 .row2-column3 .radio-items input:hover + .option {
+  font-weight: 900;
+  transition: 0.3s;
 }
 .main-container .row3 {
   display: flex;
