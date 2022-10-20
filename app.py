@@ -341,7 +341,7 @@ def graph_dias(value, clk_data):
     dias_mas_ocupados.columns = ['Day','Date','Quantity', 'Average']
     dias_graph = dias_mas_ocupados.sort_values(['Average'], ascending=False)
     
-    colors = ['#CFA22E']*7
+    colors = ['#E5B028']*7
     if clk_data != None:
         clk = clk_data['points'][0]['x']
         list_dias = dias_graph['Day'].tolist()
@@ -402,7 +402,7 @@ def graph_horas(clk_data):
                         'x': horas_mas_ocupadas['hour'],
                         'y': horas_mas_ocupadas['avg'],
                         'mode': 'lines+markers',
-                        'line': {'color': '#CFA22E'},
+                        'line': {'color': '#E5B028'},
                         # 'text': horas_mas_ocupadas['hour'],
                         'stackgroup': 'one',
                     }
@@ -468,7 +468,7 @@ def graph_horas(clk_data):
                         'x': horas_mas_ocupadas['hour'],
                         'y': horas_mas_ocupadas['avg'],
                         'mode': 'lines+markers',
-                        'line': {'color': '#CFA22E'},
+                        'line': {'color': '#E5B028'},
                         # 'text': horas_mas_ocupadas['hour'],
                         'stackgroup': 'one'
                     }
@@ -526,18 +526,23 @@ def graph_horas(clk_data):
 @app.callback(
     Output('revenue-per-month', component_property='figure'),
     [Input('dias-aux', component_property='value')],
-    [Input('dias-aux', component_property='value')]
+    [Input('revenue-per-month', component_property='clickData')]
 )
 
-def revenue_per_month(value, value2):
+def revenue_per_month(value, clk_data):
     data = aux3.groupby(['month'], as_index=False).agg({'total_price': 'sum'})
     data = data.sort_values(['total_price'], ascending=True)
     data['month'] = data['month'] + '   '
+    colors = ['#E5B028']*12
+    if clk_data != None:
+        clk = clk_data['points'][0]['label']
+        list_dias = data['month'].tolist()
+        colors[list_dias.index(clk)] = '#252525'
     data_graph = [go.Bar(
         y = data['month'],
         x = data['total_price'],
         orientation='h',
-        marker_color=['#CFA22E']*len(data),
+        marker_color=colors,
         text=data['total_price'],
         texttemplate='%{text:,.0f}',
         textfont_size=60,
@@ -594,7 +599,7 @@ def best_selling(selector):
         y = data['Name'],
         x = data['Pizzas Sold'],
         orientation='h',
-        marker_color=['#CFA22E']*len(mejores_pizzas),
+        marker_color=['#E5B028']*len(mejores_pizzas),
         text=data['Pizzas Sold'],
         texttemplate='%{text:,.0f}',
         textfont_size=50,
@@ -649,7 +654,7 @@ def worst_selling(selector):
         y = data['Name'],
         x = data['Pizzas Sold'],
         orientation='h',
-        marker_color=['#CFA22E']*len(mejores_pizzas),
+        marker_color=['#E5B028']*len(mejores_pizzas),
         text=data['Pizzas Sold'],
         texttemplate='%{text:,.0f}',
         textfont_size=50,
@@ -700,7 +705,7 @@ def size_pizzas(value):
         ))
 
     fig = go.Figure(data=[go.Pie(labels=pizza_category['category'], values=pizza_category['quantity'],
-                                hole=.5, scalegroup='one', marker_colors=['#CFA22E','#A98425','#7E631B','#574411',])],
+                                hole=.5, scalegroup='one', marker_colors=['#E5B028','#A98425','#7E631B','#574411',])],
                     layout=layout)
     fig.update_layout({
         'plot_bgcolor': 'rgba(1, 1, 1, 0)',
@@ -733,7 +738,7 @@ def graph_horas(clk_data):
         y = analisis['description'],
         x = analisis['Orders'],
         orientation='h',
-        marker_color=['#CFA22E']*len(mejores_pizzas),
+        marker_color=['#E5B028']*len(mejores_pizzas),
         text=analisis['Orders'],
         texttemplate='%{text:,.0f}',
         textfont_size=50,
@@ -787,7 +792,7 @@ def size_pizzas(value):
         ))
 
     fig = go.Figure(data=[go.Pie(labels=demo['Description'], values=demo['Pizzas'],
-                                hole=.5, scalegroup='one', marker_colors=['#CFA22E','#A98425','#7E631B','#574411',])],
+                                hole=.5, scalegroup='one', marker_colors=['#E5B028','#A98425','#7E631B','#574411',])],
                     layout=layout)
     fig.update_layout({
         'plot_bgcolor': 'rgba(1, 1, 1, 0)',
